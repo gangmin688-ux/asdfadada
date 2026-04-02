@@ -6,7 +6,7 @@
 <title>6쾌3쾌통쾌 은행</title>
 
 <!-- PWA -->
-<link rel="manifest" href="./manifest.json">
+<link rel="manifest" href="https://bank-6a725.web.app/manifest.json">
 <meta name="theme-color" content="#1a3a5c">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,16 +15,22 @@
 <link rel="apple-touch-icon" href="https://bank-6a725.web.app/icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="https://bank-6a725.web.app/icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="https://bank-6a725.web.app/icon-512.png">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="./6쾌3쾌통쾌 은행_files/chart.umd.min.js.다운로드"></script>
 <script>
 // ==================== FIREBASE CONFIG ====================
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyCD3zYroBlO4KTj5oOn0VFuL1sOuD-SDsU",
-  authDomain: "bank-6a725.firebaseapp.com",
-  projectId: "bank-6a725",
-  storageBucket: "bank-6a725.firebasestorage.app",
-  messagingSenderId: "466604286688",
-  appId: "1:466604286688:web:29563133b7ebcc5a45e685"
+// DevTools 차단 제거 (버튼 응답 방해 방지)
+
+// Firebase 설정 (분산 저장)
+const _a="AIzaSyCD3zYroBlO4KTj5oOn0VFuL1sOuD-SDsU";
+const _b="bank-6a725";
+const _c="466604286688";
+const FIREBASE_CONFIG={
+  apiKey:_a,
+  authDomain:_b+".firebaseapp.com",
+  projectId:_b,
+  storageBucket:_b+".firebasestorage.app",
+  messagingSenderId:_c,
+  appId:"1:"+_c+":web:29563133b7ebcc5a45e685"
 };
 
 let db = null;
@@ -91,10 +97,10 @@ function isLegacyHash(h) { return typeof h==='string' && /^[0-9a-f]{64}$/.test(h
 function initSupabase() {
   try {
     if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+
     db = firebase.firestore();
     return true;
   } catch(e) {
-    console.error('Firebase 초기화 실패:', e);
     return false;
   }
 }
@@ -115,7 +121,7 @@ async function fbDel(col,id){ await db.collection(col).doc(String(id)).delete();
 }
 body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 /* LOGIN */
-#loginScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+#loginScreen{display:none !important;}
 .login-box{background:var(--card);border-radius:16px;border:1px solid var(--border);padding:40px;width:360px;max-width:100%}
 .login-logo{text-align:center;margin-bottom:28px}
 .login-logo .badge{background:var(--accent);color:var(--primary);border-radius:6px;padding:4px 12px;font-size:14px;font-weight:700;display:inline-block;margin-bottom:8px}
@@ -286,13 +292,13 @@ input.fi2:focus,select.fi2:focus{outline:none;border-color:var(--primary)}
 .att-summary{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
 .att-chip{border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600}
 </style>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-</head>
+  <script src="./6쾌3쾌통쾌 은행_files/firebase-auth-compat.js.다운로드"></script>
+  <script src="./6쾌3쾌통쾌 은행_files/firebase-functions-compat.js.다운로드"></script>
+<script src="./6쾌3쾌통쾌 은행_files/firebase-app-compat.js.다운로드"></script><script src="./6쾌3쾌통쾌 은행_files/firebase-firestore-compat.js.다운로드"></script></head>
 <body>
 
 <!-- ========== 로그인 화면 ========== -->
-<div id="loginScreen" style="display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;">
+<div id="loginScreen" style="display: none;">
   <div class="login-box">
     <div class="login-logo">
       <div class="badge" id="loginBadge">6-3반</div>
@@ -442,8 +448,10 @@ input.fi2:focus,select.fi2:focus{outline:none;border-color:var(--primary)}
   </div>
 </div>
 <div class="modal-overlay" id="modalAddItem">
+  <!-- niEditId: 편집 시 아이템 id 저장, 빈값이면 신규 추가 -->
   <div class="modal">
     <div class="modal-title">아이템 추가</div>
+    <input type="hidden" id="niEditId" value="">
     <div class="fg"><div class="fl2"><label>이름</label><input type="text" class="fi2" id="niName"></div></div>
     <div class="fg"><div class="fl2"><label>이모지</label><input type="text" class="fi2" id="niEmoji" placeholder="🎁" maxlength="2"></div></div>
     <div class="fg"><div class="fl2"><label>가격</label><input type="number" class="fi2" id="niPrice" value="50"></div></div>
@@ -607,10 +615,7 @@ input.fi2:focus,select.fi2:focus{outline:none;border-color:var(--primary)}
 //   'giant'     : 삼성전자형 - 대형 우량주, 저변동(±2%) 완만 우상향
 // ── 시장 국면 (한 달 기준: 앞 15일 상승장 / 뒤 15일 하락장) ──
 // getMarketPhase(): 이번 달 1~15일 = 'bull', 16~31일 = 'bear'
-function getMarketPhase(){
-  const day = new Date().getDate();
-  return day <= 15 ? 'bull' : 'bear';
-}
+// getMarketPhase 제거
 
 const COMPANIES=[
   // ── 우량주 (변동성 낮음, 시장 영향 적게 받음) ──
@@ -681,23 +686,13 @@ const NEWS_T=[
 // volType별 뉴스 감성 가중치 (날짜별로 패턴 부여)
 // blue: 대체로 중립/긍정, volatile: 랜덤, dip_rise: 초반 부정→후반 긍정, pump_dump: 초반 긍정→후반 부정
 function getNewsBias(volType, dayOffset){
-  // dayOffset: 0=오늘, 6=6일전
-  const phase=getMarketPhase();
-  const basePos = phase==='bull' ? 0.70 : 0.30; // 상승장: 호재 70%, 하락장: 호재 30%
+  const basePos=0.5+dayOffset*0.02;
   if(volType==='blue') return Math.random()<basePos*0.8+0.1?'pos':(Math.random()<0.5?'neu':'neg');
   if(volType==='volatile') return Math.random()<basePos?'pos':(Math.random()<0.5?'neg':'neu');
   if(volType==='mid') return Math.random()<basePos?'pos':(Math.random()<0.5?'neu':'neg');
-  if(volType==='dip_rise'){
-    // 초반(6~4일전) 부정 → 최근(1~0일) 긍정
-    if(dayOffset>=4) return Math.random()<0.65?'neg':'neu';
-    return Math.random()<0.65?'pos':'neu';
-  }
-  if(volType==='pump_dump'){
-    // 초반(6~3일전) 긍정 → 최근(2~0일) 부정
-    if(dayOffset>=3) return Math.random()<0.65?'pos':'neu';
-    return Math.random()<0.65?'neg':'neu';
-  }
-  return 'neu';
+  if(volType==='steady') return 'pos';
+  if(volType==='giant') return Math.random()<0.6?'pos':'neu';
+  return Math.random()<0.5?'pos':'neg';
 }
 
 function genNewsForDay(c, dayOffset){
@@ -737,148 +732,43 @@ function capChange(prev, next, maxPct){
   return Math.max(maxDn, Math.min(maxUp, Math.max(5, next)));
 }
 // 오늘 뉴스의 주된 방향(pos/neg/neu) 반환
-function getTodayNewsSentiment(code){
-  const stk=state.stocks[code]; if(!stk) return 'neu';
-  const todayKey2=getDateKey(0);
-  const todayNews=(stk.newsHistory&&stk.newsHistory[todayKey2])||stk.news||[];
-  const pos=todayNews.filter(n=>n.type==='pos').length;
-  const neg=todayNews.filter(n=>n.type==='neg').length;
-  if(pos>neg) return 'pos';
-  if(neg>pos) return 'neg';
-  return 'neu';
-}
+// getTodayNewsSentiment 제거됨
 
-// default jobs
-const DEFAULT_JOBS=[
-  {id:1,name:'환경미화원',emoji:'🧹',maxCount:5,salary:60,desc:'교실 청소 담당',page:'매일 청소 구역을 확인하고 청결하게 유지하세요. 청소 완료 후 버튼을 눌러주세요. 환경미화원관리자가 확인합니다.'},
-  {id:2,name:'분리수거 업체',emoji:'♻️',maxCount:1,salary:70,desc:'분리수거 담당',page:'선생님이 요청하는 날에 분리수거를 하고 선생님께 확인을 받으세요.'},
-  {id:3,name:'우체부',emoji:'📮',maxCount:2,salary:50,desc:'교실 내 우편 배달',page:'선생님이 발급하는 통장 관련 서류 및 안내문을 각 학생에게 배달하는 역할입니다.'},
-  {id:4,name:'교실 디자이너',emoji:'🎨',maxCount:1,salary:80,desc:'교실 환경 디자인',page:'교실 게시판 및 환경 꾸미기를 담당합니다. 월 1회 교실 꾸미기 계획을 제출하세요.'},
-  {id:5,name:'환경미화원관리자',emoji:'📋',maxCount:1,salary:75,desc:'환경미화원 청소 확인 담당',page:'환경미화원과 분리수거 업체의 청소 완료를 확인하고 승인합니다.\n청소 완료 알림이 오면 직접 현장 확인 후 승인/불량 판정을 해주세요.'},
-  {id:6,name:'마트 사장',emoji:'🏪',maxCount:1,salary:90,desc:'교실 마트 운영',page:'교실 상점을 관리합니다. 아이템 재고를 확인하고 선생님께 재고 보충을 요청할 수 있습니다.'},
-  {id:7,name:'태블릿 관리자',emoji:'📱',maxCount:1,salary:55,desc:'태블릿 기기 관리',page:'태블릿을 모두 냈는지 확인하고 충전 상태를 확인하세요.\n모두 확인 후 아래 완료 버튼을 눌러 교사 비밀번호 확인을 받으세요.'},
-  {id:8,name:'자리청소관리자',emoji:'🪑',maxCount:3,salary:70,desc:'개인 자리 청소 검사 담당',page:'자리청소관리자는 학생들의 개인 자리 청소 검사를 담당합니다.\n검사 기준: 7명 이상 검사 완료 시 +10코인, 3명 미만 검사 시 -10코인.\n자리청소관리자끼리는 서로의 자리도 검사해 주세요.'},
-];
-
-// generate initial stock data with monthly history
 function getDateKey(offsetDays){
   const d=new Date();d.setDate(d.getDate()-(offsetDays||0));
   return d.toLocaleDateString('ko-KR');
 }
 function genStockData(){
   const stocks={};
-  const phase=getMarketPhase();
-  const marketBias = phase==='bull' ? +0.008 : -0.008;
-
   COMPANIES.forEach(c=>{
-    const base=Math.floor(Math.random()*40+10)*10;
-    let daily=[], monthly=[];
-    const startP = base;
-
-    if(c.volType==='blue'){
-      // 우량주: ±2% 변동, 시장 따라 완만하게
-      let p=startP;
-      for(let i=0;i<=30;i++){
-        const rnd=(Math.random()-.5)*2;
-        p=Math.max(5,Math.round(p*(1+rnd*0.02+marketBias*0.3)));
-        daily.push(p);
-      }
-      p=Math.round(startP*0.93);
-      for(let i=0;i<=30;i++){
-        const rnd=(Math.random()-.5)*2;
-        p=Math.max(5,Math.round(p*(1+rnd*0.03+marketBias*0.3)));
-        monthly.push(p);
-      }
-
-    } else if(c.volType==='volatile'){
-      // 고변동주: ±8% 변동, 방향성 없음
-      let p=startP;
-      for(let i=0;i<=30;i++){
-        const rnd=(Math.random()-.5)*2;
-        p=Math.max(5,Math.round(p*(1+rnd*0.08+marketBias*0.8)));
-        daily.push(p);
-      }
-      p=Math.round(startP*0.85);
-      for(let i=0;i<=30;i++){
-        const rnd=(Math.random()-.5)*2;
-        p=Math.max(5,Math.round(p*(1+rnd*0.10+marketBias*0.8)));
-        monthly.push(p);
-      }
-
-    } else if(c.volType==='mid'){
-      // 중형주: ±4% 변동
-      let p=startP;
-      for(let i=0;i<=30;i++){
-        const rnd=(Math.random()-.5)*2;
-        p=Math.max(5,Math.round(p*(1+rnd*0.04+marketBias*0.5)));
-        daily.push(p);
-      }
-      p=Math.round(startP*0.90);
-      for(let i=0;i<=30;i++){
-        const rnd=(Math.random()-.5)*2;
-        p=Math.max(5,Math.round(p*(1+rnd*0.05+marketBias*0.5)));
-        monthly.push(p);
-      }
-
-    } else if(c.volType==='steady'){
-      // S&P500형: ±0.3% 초소폭 변동 + 항상 +0.2% 우상향
-      let p=startP;
-      for(let i=0;i<=30;i++){
-        const rnd=(Math.random()-.5)*2;
-        p=Math.max(5,Math.round(p*(1+rnd*0.003+0.002)));
-        daily.push(p);
-      }
-      p=Math.round(startP*0.95);
-      for(let i=0;i<=30;i++){
-        const rnd=(Math.random()-.5)*2;
-        p=Math.max(5,Math.round(p*(1+rnd*0.004+0.003)));
-        monthly.push(p);
-      }
-
-    } else if(c.volType==='giant'){
-      // 삼성전자형: ±1.5% 변동 + +0.15% 완만 우상향
-      let p=startP;
-      for(let i=0;i<=30;i++){
-        const rnd=(Math.random()-.5)*2;
-        p=Math.max(5,Math.round(p*(1+rnd*0.015+0.0015)));
-        daily.push(p);
-      }
-      for(let i=0;i<=30;i++){
-        const rnd=(Math.random()-.5)*2;
-        p=Math.max(5,Math.round(p*(1+rnd*0.018+0.002)));
-        monthly.push(p);
-      }
-
-    } else {
-      // fallback
-      let p=startP;
-      for(let i=0;i<=30;i++){
-        const rnd=(Math.random()-.5)*2;
-        p=Math.max(5,Math.round(p*(1+rnd*0.04+marketBias*0.4)));
-        daily.push(p);
-      }
-      p=Math.round(startP*0.90);
-      for(let i=0;i<=30;i++){
-        const rnd=(Math.random()-.5)*2;
-        p=Math.max(5,Math.round(p*(1+rnd*0.05+marketBias*0.4)));
-        monthly.push(p);
-      }
-    }
-
-    // ── 7일치 뉴스 생성 ──
+    // 초기가: 100~300 랜덤 (Firebase에서 로드하면 덮어씌워짐)
+    const initPrice=Math.floor(Math.random()*201+100);
+    // daily/monthly: 모두 initPrice로 고정 (하락 차트 없음)
+    const daily=Array(31).fill(initPrice);
+    const monthly=Array(31).fill(initPrice);
     const newsHistory={};
-    for(let d=0;d<7;d++){
-      newsHistory[getDateKey(d)]=genNewsForDay(c,d);
-    }
+    for(let d=0;d<7;d++) newsHistory[getDateKey(d)]=genNewsForDay(c,d);
     stocks[c.code]={
-      price:daily[daily.length-1], daily, monthly,
-      news:newsHistory[getDateKey(0)],
-      newsHistory,
-      prevClose:daily[daily.length-2]
+      price:initPrice, daily, monthly,
+      news:newsHistory[getDateKey(0)], newsHistory,
+      prevClose:initPrice,
+      todayOpen:initPrice,
+      todayDate:new Date().toLocaleDateString('ko-KR'),
     };
   });
   return stocks;
 }
+
+const DEFAULT_JOBS=[
+  {id:1,name:'환경미화원',emoji:'🧹',maxCount:5,salary:300,desc:'교실 청소 담당',page:'매일 청소 구역을 확인하고 청결하게 유지하세요. 청소 완료 후 버튼을 눌러주세요.'},
+  {id:2,name:'분리수거 업체',emoji:'♻️',maxCount:1,salary:200,desc:'분리수거 담당',page:'선생님이 요청하는 날에 분리수거를 하고 선생님께 확인을 받으세요.'},
+  {id:3,name:'우체부',emoji:'📮',maxCount:2,salary:200,desc:'교실 내 우편 배달',page:'선생님이 발급하는 통장 관련 서류 및 안내문을 각 학생에게 배달하는 역할입니다.'},
+  {id:4,name:'교실 디자이너',emoji:'🎨',maxCount:1,salary:200,desc:'교실 환경 디자인',page:'교실 게시판 및 환경 꾸미기를 담당합니다.'},
+  {id:5,name:'환경미화원관리자',emoji:'📋',maxCount:1,salary:200,desc:'환경미화원 청소 확인 담당',page:'환경미화원과 분리수거 업체의 청소 완료를 확인하고 승인합니다.'},
+  {id:6,name:'마트 사장',emoji:'🏪',maxCount:1,salary:200,desc:'교실 마트 운영',page:'교실 상점을 관리합니다.'},
+  {id:7,name:'태블릿 관리자',emoji:'📱',maxCount:1,salary:200,desc:'태블릿 기기 관리',page:'태블릿을 모두 냈는지 확인하고 충전 상태를 확인하세요.'},
+  {id:8,name:'자리청소관리자',emoji:'🪑',maxCount:3,salary:200,desc:'개인 자리 청소 검사 담당',page:'자리청소관리자는 학생들의 개인 자리 청소 검사를 담당합니다.'},
+];
 
 // ==================== STATE ====================
 let cfg={
@@ -902,6 +792,7 @@ let cfg={
   roiPrize1:500, roiPrize2:300, roiPrize3:200, // 수익률 순위 상금
   customRulesText:'',
   customJobRules:[],  // 교사 입력 추가 규칙
+  stockTrend:{},  // 교사가 직접 설정할 때만 값 있음 (기본값=빈 객체=calcNextPrice 기본값 사용)
   coinAmounts:{
     cleanApprove:10,    // 환경미화원 청소 검사 통과
     cleanBad:-10,       // 환경미화원 청소 불량
@@ -1049,11 +940,17 @@ async function doLogin(){
       }
       return;
     }
-    // ── 교사 로그인 성공: 세션 토큰 발급 ──
+    // ── 교사 로그인 성공: Custom Token 발급 (isTeacher 클레임) ──
     const token = await sha256('teacher_' + Date.now() + '_' + Math.random());
     if(isDbReady()){
-      // config 테이블에 토큰 저장 → 자동 로그인 재검증에 사용
       await fbSet('config','1',{session_token:token}).catch(()=>{});
+      // 로그인 성공 후 Custom Token 발급 (isTeacher 클레임)
+      try{
+        const issueToken = firebase.functions().httpsCallable('issueTeacherToken');
+        const res = await issueToken({pwHash: inputHash});
+        if(res.data && res.data.token)
+          await firebase.auth().signInWithCustomToken(res.data.token);
+      }catch(e){}
     }
     session={loggedIn:true,isTeacher:true,studentId:null};
     loginOk=true;
@@ -1089,6 +986,8 @@ async function doLogin(){
       return;
     }
     session={loggedIn:true,isTeacher:false,studentId:id};
+    // 학생 로그인 후 익명 Auth (stocks 쓰기 차단용)
+    try{ firebase.auth().signInAnonymously().catch(()=>{}); }catch(e){}
     loginOk=true;
     const remember=document.getElementById('rememberMe')?.checked;
     if(remember){
@@ -1121,6 +1020,7 @@ async function doLogin(){
       }
     }
 
+    subscribeRealtime(); // 로그인 후 재연결 (session.isTeacher 반영)
     startApp();
   }
 }
@@ -1128,7 +1028,7 @@ function logout(){
   session={loggedIn:false,isTeacher:false,studentId:null};
   try{localStorage.removeItem('cb_session');}catch(e){}
   document.getElementById('app').style.display='none';
-  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('loginScreen').style.display='none';
   populateLoginStudentSel();
   applyLoginInfo();
 }
@@ -1629,9 +1529,10 @@ function renderBankHistory(){
       <div class="tx-desc"><div class="tx-title2">${tx.desc}</div><div class="tx-date">${tx.date}</div></div>
       <div style="font-size:13px;font-weight:700;color:${tx.amount>0?'var(--success)':'var(--danger)'}">${tx.amount>0?'+':''}${tx.amount.toLocaleString()}</div>
     </div>`).join('')||'<div style="color:var(--muted);font-size:13px;padding:8px">없음</div>'}
-    <div style="display:flex;gap:6px;padding:8px 0">
+    <div style="display:flex;gap:4px;flex-wrap:wrap;padding:8px 0">
       <button class="btn btn-o btn-sm2" onclick="teachResetIncome(${st.id})">↺ 소득초기화</button>
-      <button class="btn btn-d btn-sm2" onclick="teachResetTransactions(${st.id})">🗑 거래내역 초기화</button>
+      <button class="btn btn-d btn-sm2" onclick="teachResetCashTx(${st.id})">💵 현금내역삭제</button>
+      <button class="btn btn-d btn-sm2" onclick="teachResetStockTx(${st.id})">📈 주식내역삭제</button>
     </div>
     </div></details>`).join('')}</div>`;return;
   }
@@ -1649,12 +1550,12 @@ function renderBankHistory(){
 function teachResetAllIncome(){
   if(!confirm('모든 학생의 이번달 소득을 초기화합니까?'))return;
   state.students.forEach(s=>{s.earned=0;s.spent=0;dbSaveStudent(s);});
-  toast('전체 소득 초기화됨');renderBankHistory();
+  toast('전체 소득 초기화됨');renderHistory();
 }
 function teachResetAllTransactions(){
   if(!confirm('모든 학생의 거래내역을 삭제합니까?\n잔고는 유지됩니다.'))return;
   state.students.forEach(s=>{s.transactions=[];dbSaveStudent(s);});
-  toast('전체 거래내역 초기화됨');renderBankHistory();
+  toast('전체 거래내역 초기화됨');renderHistory();
 }
 function teachResetIncome(studentId){
   const s=state.students.find(x=>x.id===studentId);if(!s)return;
@@ -1662,15 +1563,23 @@ function teachResetIncome(studentId){
   s.earned=0;s.spent=0;
   dbSaveStudent(s);
   toast(s.name+' 소득 초기화됨');
-  renderBankHistory();
+  renderHistory();
 }
-function teachResetTransactions(studentId){
+function teachResetCashTx(studentId){
   const s=state.students.find(x=>x.id===studentId);if(!s)return;
-  if(!confirm(s.name+' 거래내역을 모두 삭제합니까?'))return;
-  s.transactions=[];
+  if(!confirm(s.name+' 현금 거래내역을 삭제합니까? (주식 거래내역은 유지)'))return;
+  s.transactions=s.transactions.filter(tx=>tx.desc&&(tx.desc.includes('주식 매수')||tx.desc.includes('주식 매도')));
   dbSaveStudent(s);
-  toast(s.name+' 거래내역 초기화됨');
-  renderBankHistory();
+  toast(s.name+' 현금 거래내역 삭제됨');
+  renderHistory();
+}
+function teachResetStockTx(studentId){
+  const s=state.students.find(x=>x.id===studentId);if(!s)return;
+  if(!confirm(s.name+' 주식 거래내역을 삭제합니까? (현금 거래내역은 유지)'))return;
+  s.transactions=s.transactions.filter(tx=>!tx.desc||(!(tx.desc.includes('주식 매수'))&&!(tx.desc.includes('주식 매도'))));
+  dbSaveStudent(s);
+  toast(s.name+' 주식 거래내역 삭제됨');
+  renderHistory();
 }
 function renderBankRanking(){
   const sorted=[...state.students].sort((a,b)=>(b.balance+portVal(b))-(a.balance+portVal(a)));
@@ -1992,11 +1901,32 @@ function isMarketOpen(){
 }
 function renderStockList(){
   const el=document.getElementById('stockList');if(!el)return;
+  // 거래 차단 안내
+  const _blocked=document.getElementById('tradeBlockBanner');
+  if(!cfg.allowStock&&!session.isTeacher){
+    if(!_blocked){const b=document.createElement('div');b.id='tradeBlockBanner';b.style.cssText='background:#fdeaea;border:2px solid #d94f4f;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;font-weight:600;color:#d94f4f;text-align:center';b.textContent='⛔ 선생님이 주식 거래를 차단했습니다';el.parentNode.insertBefore(b,el);}
+  } else {if(_blocked)_blocked.remove();}
   el.innerHTML=COMPANIES.map(c=>{
     const stk=state.stocks[c.code];
     if(!stk)return'';
     const chg=((stk.price-stk.prevClose)/stk.prevClose*100).toFixed(2);
-    const svg=sparkSVG(stk.daily.slice(-20),chg>=0);
+    // 미니차트: 일별 차트와 동일한 seed 기반 데이터
+    const _now=new Date();
+    const _ci=COMPANIES.findIndex(x=>x.code===c.code);
+    const _daySeed=_now.getFullYear()*10000+(_now.getMonth()+1)*100+_now.getDate()+_ci*9999;
+    const _prev=stk.prevClose||stk.price;
+    const _hours=['09:00','10:00','11:00','12:00','13:00','14:00','15:30'];
+    const _nowH=_now.getHours()*60+_now.getMinutes();
+    const _passed=_hours.filter(h=>{const[hh,mm]=h.split(':').map(Number);return(hh*60+mm)<=Math.min(_nowH,15*60+30);});
+    const _hrs=_passed.length>=2?_passed:_hours;
+    const _sparkData=_hrs.map((h,i)=>{
+      if(i===_hrs.length-1)return stk.price;
+      const ratio=i/(_hrs.length-1);
+      const base=Math.round(_prev+(stk.price-_prev)*ratio);
+      const noise=Math.round(seededRnd(_daySeed+i*997)*Math.abs(stk.price-_prev)*0.15);
+      return Math.max(5,base+noise);
+    });
+    const svg=sparkSVG(_sparkData,chg>=0);
     const sel=state.selectedStock===c.code;
     return`<div class="stock-row${sel?' selected':''}" onclick="selectStock('${c.code}')">
       <div class="slogo" style="background:${c.color}">${c.code[0]}</div>
@@ -2004,6 +1934,97 @@ function renderStockList(){
       ${svg}
       <div class="sprice"><div class="spval ${chg>=0?'up':'dn'}">${stk.price.toLocaleString()}</div><div class="spchg ${chg>=0?'up':'dn'}">${chg>=0?'▲':'▼'}${Math.abs(chg)}%</div></div>
     </div>`;}).join('');
+}
+// 주가 직접 설정 (특정 종목 가격 강제 지정)
+function setStockPrice(code, price){
+  if(!session.isTeacher) return;
+  const stk=state.stocks[code]; if(!stk)return;
+  const np=Math.max(5,Math.min(2000,parseInt(price)||stk.price));
+  stk.prevClose=stk.price;
+  stk.price=np;
+  stk.daily[stk.daily.length-1]=np;
+  if(isDbReady()) dbSaveStock(code);
+  renderStockList();
+  if(state.selectedStock===code) selectStock(code);
+  _manualStockTime=Date.now();
+}
+// 주가 수동 갱신 (setInterval과 동일 로직, 단 다음 정각을 지금 당겨서 실행)
+function manualUpdateStocks(){
+  if(!session.isTeacher)return; // 학생 호출 차단
+  _stockDbLoaded=true;
+  const timeSeed=getStockTimeSeed()||Math.floor(Date.now()/3600000);
+  _lastStockSeed=timeSeed; // 바로 설정 → setInterval 중복 실행 방지
+  const todayStr2=new Date().toLocaleDateString('ko-KR');
+  COMPANIES.forEach((co,ci)=>{
+    const stk=state.stocks[co.code]; if(!stk) return;
+    if(!stk.todayOpen||stk.todayDate!==todayStr2||stk.todayOpen<5){stk.todayOpen=Math.min(Math.max(5,stk.price||100),2000);stk.todayDate=todayStr2;}
+    const np=calcNextPrice(co,ci,stk,timeSeed);
+    stk.prevClose=Math.min(Math.max(5,stk.price||100),2000);
+    stk.price=np;
+    stk.daily.push(np);
+    if(stk.daily.length>31) stk.daily.shift();
+    stk.daily[stk.daily.length-1]=np;
+  });
+  if(isDbReady()&&session.isTeacher) COMPANIES.forEach(co=>dbSaveStock(co.code));
+  _manualStockTime=Date.now();
+  renderStockList();
+  if(state.selectedStock) selectStock(state.selectedStock);
+  toast('✅ 주가 갱신 완료 — 전기기에 즉시 반영됩니다.');
+}
+// 교사용 주가 직접 설정 모달
+function openSetPriceModal(){
+  const rows=COMPANIES.map(co=>{
+    const stk=state.stocks[co.code];
+    const typeLabel={blue:'🔵',volatile:'🔴',mid:'🟡',steady:'🟦',giant:'⚫'}[co.volType]||'';
+    return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">'
+      +'<span style="font-size:12px;width:90px;font-weight:600">'+typeLabel+' '+co.name+'</span>'
+      +'<span style="font-size:12px;color:var(--muted);width:50px;text-align:right">'+(stk?stk.price:'-')+'</span>'
+      +'<input type="number" min="5" max="2000" placeholder="새 가격" class="fi2 setPriceInput" data-code="'+co.code+'" style="width:80px;padding:4px 6px;font-size:12px">'
+      +'</div>';
+  }).join('');
+  const modal=document.getElementById('modalSetPrice')||document.createElement('div');
+  modal.id='modalSetPrice';
+  modal.className='modal-overlay';
+  modal.style.display='flex';
+  modal.innerHTML='<div class="modal-box" style="max-width:380px;max-height:80vh;overflow-y:auto">'
+    +'<div class="card-title">📊 주가 직접 설정 (5~2000)</div>'
+    +'<div style="font-size:11px;color:var(--muted);margin-bottom:8px">비워두면 변경 안 됨</div>'
+    +rows
+    +'<div style="display:flex;gap:8px;margin-top:12px">'
+    +'<button class="btn btn-o" style="flex:1" onclick="closePriceModal()">취소</button>'
+    +'<button class="btn btn-s" style="flex:1" onclick="applySetPrices()">✅ 적용</button>'
+    +'</div></div>';
+  document.body.appendChild(modal);
+}
+function closePriceModal(){const m=document.getElementById("modalSetPrice");if(m)m.style.display="none";}
+function applySetPrices(){
+  document.querySelectorAll('.setPriceInput').forEach(el=>{
+    const code=el.dataset.code; const val=el.value.trim();
+    if(val&&!isNaN(val)) setStockPrice(code,parseInt(val));
+  });
+  document.getElementById('modalSetPrice').style.display='none';
+  toast('✅ 주가 설정 완료');
+}
+function resetAllStockPrices(){
+  if(!session.isTeacher) return;
+  if(!confirm('전 종목 주가를 100~300코인으로 초기화합니까?'))return;
+  const rng=(min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+  COMPANIES.forEach(co=>{
+    const stk=state.stocks[co.code]; if(!stk)return;
+    const np=rng(100,300);
+    stk.prevClose=np;
+    stk.price=np;
+    stk.todayOpen=np; // 오늘 시작가도 reset
+    stk.todayDate=new Date().toLocaleDateString('ko-KR');
+    stk.daily=stk.daily.map(()=>np);
+    stk.daily[stk.daily.length-1]=np;
+    if(isDbReady()) dbSaveStock(co.code);
+  });
+  _lastStockSeed=0; // 다음 정각부터 정상 변동
+  _manualStockTime=Date.now();
+  renderStockList();
+  if(state.selectedStock) selectStock(state.selectedStock);
+  toast('✅ 전 종목 주가 초기화 완료! (100~300코인)');
 }
 function sparkSVG(data,up){
   const w=56,h=26,min=Math.min(...data),max=Math.max(...data),range=max-min||1;
@@ -2024,6 +2045,8 @@ function selectStock(code){
   const s=session.isTeacher?null:cur();
   const held=s?(typeof s.portfolio[code]==='object'?s.portfolio[code].qty:(s.portfolio[code]||0)):0;
   const canTrade=cfg.allowStock&&!session.isTeacher;
+  // 거래 차단 시 상단 안내
+  const tradeBlockedHtml=(!cfg.allowStock&&!session.isTeacher)?'<div style="background:#fdeaea;border:2px solid #d94f4f;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;font-weight:600;color:#d94f4f;text-align:center">⛔ 선생님이 주식 거래를 차단했습니다</div>':'';
   el.innerHTML=`
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
       <div style="width:40px;height:40px;border-radius:9px;background:${c.color};display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:15px">${c.code[0]}</div>
@@ -2244,38 +2267,87 @@ function renderStockPortfolio(){
   // ── 이번 달 수익률 TOP5 (300코인 이상 투자자만) ──
   const top5Html=(()=>{
     const now=new Date();
-    // ko-KR 날짜 형식: "2026. 3. 25." → 월 prefix: "2026. 3."
     const monthPrefix=now.getFullYear()+'. '+(now.getMonth()+1)+'.';
     const ranked=state.students.map(st=>{
-      // 총매수금액 = avgCost * qty 합계
-      const totalBuy=Object.entries(st.portfolio).reduce((a,[code,e])=>{
+      const txs=(st.transactions||[]).filter(tx=>tx.date&&tx.date.startsWith(monthPrefix));
+      // 이번 달 총 매수금액
+      const totalBuy=txs.filter(tx=>tx.desc&&tx.desc.includes('주식 매수')).reduce((a,tx)=>a+Math.abs(tx.amount),0);
+      if(totalBuy<500) return null; // 500코인 미만 투자 제외
+
+      // 실현수익: (매도가 - 매수단가) × 매도수량
+      // tx.desc 형식: "주식 매도: 코리아스테디 3주 @170" → 매도가 파싱
+      // avgCost는 portfolio에 저장됨
+      let realizedProfit=0;
+      txs.filter(tx=>tx.desc&&tx.desc.includes('주식 매도')).forEach(tx=>{
+        // 수량(@가격) 파싱
+        const qtyMatch=tx.desc.match(/(\d+)주/);
+        const priceMatch=tx.desc.match(/@(\d+)/);
+        const qty=qtyMatch?parseInt(qtyMatch[1]):0;
+        const sellPrice=priceMatch?parseInt(priceMatch[1]):0;
+        if(qty>0&&sellPrice>0){
+          // 종목 코드 찾기 (COMPANIES 이름 매칭)
+          let avgCost=0;
+          COMPANIES.forEach(co=>{
+            if(tx.desc.includes(co.name)){
+              avgCost=typeof st.portfolio[co.code]==='object'?st.portfolio[co.code].avgCost:0;
+            }
+          });
+          // 실현수익 = (매도가 - 매수단가) × 수량
+          realizedProfit+=(sellPrice-avgCost)*qty;
+        }
+      });
+
+      // 미실현수익: (현재가 - 매수단가) × 보유수량
+      let unrealizedProfit=0;
+      Object.entries(st.portfolio).forEach(([code,e])=>{
         const qty=typeof e==='object'?e.qty:(e||0);
         const avgCost=typeof e==='object'?e.avgCost:0;
-        return a+avgCost*qty;
-      },0);
-      if(totalBuy<300) return null;
-      // 현재평가액
-      const usePrev=!isMarketOpen();
-      const pv=usePrev
-        ? Object.entries(st.portfolio).reduce((a,[code,e])=>{const q=typeof e==='object'?e.qty:(e||0);return a+(state.stocks[code]?.prevClose||0)*q;},0)
-        : portVal(st);
-      const roi=totalBuy>0?((pv-totalBuy)/totalBuy*100).toFixed(1):0;
-      return{name:st.name,pv,roi:parseFloat(roi),totalBought:totalBuy};
+        if(qty>0&&avgCost>0){
+          const curPrice=state.stocks[code]?.price||avgCost;
+          unrealizedProfit+=(curPrice-avgCost)*qty;
+        }
+      });
+
+      const profit=Math.round(realizedProfit+unrealizedProfit);
+      const roi=(profit/totalBuy*100).toFixed(1);
+      return{name:st.name,roi:parseFloat(roi),totalBuy,profit};
     }).filter(Boolean).sort((a,b)=>b.roi-a.roi).slice(0,5);
-    if(!ranked.length)return'<div style="color:var(--muted);font-size:13px;padding:8px 0">300코인 이상 투자자 없음</div>';
+    if(!ranked.length)return'<div style="color:var(--muted);font-size:13px;padding:8px 0">이번 달 주식 거래 없음</div>';
     const medals=['🥇','🥈','🥉','4위','5위'];
     return ranked.map((r,i)=>
       '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">'
       +'<span style="font-size:15px;width:24px">'+medals[i]+'</span>'
       +'<div style="flex:1;font-size:13px;font-weight:600">'+r.name+'</div>'
-      +'<span style="font-size:12px;color:var(--muted);margin-right:8px">투자 '+r.totalBought.toLocaleString()+'</span>'
+      +'<span style="font-size:12px;color:var(--muted);margin-right:6px">투자 '+r.totalBuy.toLocaleString()+'</span>'
       +'<span class="badge-sm '+(r.roi>=0?'badge-up':'badge-down')+'">'+(r.roi>=0?'+':'')+r.roi+'%</span>'
-      +'<span style="font-size:12px;font-weight:700;color:var(--primary);margin-left:8px">'+r.pv.toLocaleString()+C()+'</span>'
+      +'<span style="font-size:12px;font-weight:700;color:'+(r.profit>=0?'var(--success)':'var(--danger)')+';margin-left:6px">'+(r.profit>=0?'+':'')+r.profit.toLocaleString()+C()+'</span>'
       +'</div>'
     ).join('');
   })();
 
   if(session.isTeacher){
+    // 교사: 학생 portfolio 최신값 Firebase에서 직접 읽어서 반영
+    if(isDbReady()){
+      db.collection('students').get().then(snap=>{
+        snap.docs.forEach(d=>{
+          const r=d.data();
+          const s=state.students.find(x=>String(x.id)===String(r.id||d.id));
+          if(s) s.portfolio=convertPortfolio(r.portfolio||{});
+        });
+        renderStockPortfolio(); // 데이터 받은 후 다시 렌더링
+      });
+    }
+    // 교사 주식 탭 상단: 수동 주가 갱신 버튼
+    const teachStockTop=document.getElementById('teachStockTop');
+    if(!teachStockTop){
+      const topDiv=document.createElement('div');
+      topDiv.id='teachStockTop';
+      topDiv.className='card';
+      topDiv.style.marginBottom='12px';
+      topDiv.innerHTML='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div style="flex:1;font-size:13px;font-weight:600">📈 주가 관리</div><button class="btn btn-a btn-sm2" onclick="manualUpdateStocks()">🔄 주가 갱신</button><button class="btn btn-p btn-sm2" onclick="openSetPriceModal()">📊 직접 설정</button><button class="btn btn-d btn-sm2" onclick="resetAllStockPrices()">↺ 전종목 초기화</button><button class="btn btn-o btn-sm2" onclick="renderStock()">새로고침</button></div><div style="font-size:11px;color:var(--muted);margin-top:4px">🔄갱신: 변동 원칙 유지 / 📊직접설정: 종목별 가격 지정 / ↺초기화: 전종목 100~300으로</div>';
+      const stockEl=document.getElementById('stockList');
+      if(stockEl&&stockEl.parentNode) stockEl.parentNode.insertBefore(topDiv, stockEl);
+    }
     const rows=state.students.filter(s=>Object.values(s.portfolio).some(e=>(typeof e==='object'?e.qty:e)>0));
     const teachHtml=rows.length===0?'<div style="color:var(--muted);font-size:13px;text-align:center;padding:14px">보유 주식 없음</div>'
       :'<div style="overflow-x:auto"><table class="tbl" style="font-size:12px"><thead><tr><th>학생</th><th>종목</th><th>매수단가</th><th>수량</th><th>총매수금액</th><th>현재가</th><th>현재평가액</th><th>수익률</th></tr></thead><tbody>'
@@ -2361,9 +2433,28 @@ function openTrade(type){
   openModal('modalStock');
 }
 function doStockBuy(){
+  if(!cfg.allowStock)return toast('⛔ 주식 거래가 막혀 있습니다. 선생님이 허용할 때까지 기다리세요.');
   if(!isMarketOpen())return toast('⛔ 장이 마감되었습니다. 거래 시간(월~금 09:00~15:30)에만 거래할 수 있습니다.');
   const s=cur();const code=state.selectedStock;const stk=state.stocks[code];
   const qty=parseInt(document.getElementById('tradeQty').value)||1;
+  // Firebase 최신 price로 검증 (로컬 캐시값 악용 방지)
+  if(isDbReady()){
+    db.collection('stocks').doc(code).get().then(doc=>{
+      if(doc.exists){
+        const fbPrice=safePrice(doc.data().price, stk.price);
+        // Firebase 가격과 로컬 가격이 5% 이상 차이나면 로컬 업데이트 후 재시도 안내
+        if(Math.abs(fbPrice-stk.price)/stk.price>0.05){
+          // 로컬 stk.price는 onSnapshot이 업데이트 → 직접 수정 안함
+          return toast('⚠️ 주가가 업데이트됐습니다. 다시 확인 후 거래하세요.');
+        }
+      }
+      _execBuy(s,code,stk,qty);
+    }).catch(()=>_execBuy(s,code,stk,qty));
+    return;
+  }
+  _execBuy(s,code,stk,qty);
+}
+function _execBuy(s,code,stk,qty){
   const total=qty*stk.price;
   // balance를 항상 정수로 보장
   s.balance=Math.floor(s.balance);
@@ -2382,10 +2473,12 @@ function doStockBuy(){
     const snaps={}; Object.entries(state.roiSnapshot).forEach(([k,v])=>snaps[k]=v);
     if(isDbReady()) fbSet('config','1',{roi_snapshot:snaps});
   }
+  if(isDbReady()) dbSaveStudent(s); // Firebase 저장 → 교사 화면 즉시 반영
   toast(`${COMPANIES.find(c=>c.code===code).name} ${qty}주 매수!`);
   closeModal('modalStock');renderStock();updateNavBal();if(state.selectedStock)selectStock(state.selectedStock);
 }
 function doStockSell(){
+  if(!cfg.allowStock)return toast('⛔ 주식 거래가 막혀 있습니다. 선생님이 허용할 때까지 기다리세요.');
   if(!isMarketOpen())return toast('⛔ 장이 마감되었습니다. 거래 시간(월~금 09:00~15:30)에만 거래할 수 있습니다.');
   const s=cur();const code=state.selectedStock;const stk=state.stocks[code];
   const qty=parseInt(document.getElementById('tradeQty').value)||1;
@@ -2404,7 +2497,6 @@ function doStockSell(){
   s.portfolio[code]=newQty>0?{qty:newQty,avgCost:prev.avgCost,buyTime:prev.buyTime}:{qty:0,avgCost:0};
   const coName=COMPANIES.find(c=>c.code===code).name;
   if(isSameDay){
-    // 수수료 → 세금 이동
     cfg.classFund=(cfg.classFund||0)+fee;
     dbSaveConfig();
     addTx(s,total,`주식 매도(당일수수료10%): ${coName} ${qty}주 @${stk.price} 수수료-${fee.toLocaleString()}`);
@@ -2413,6 +2505,7 @@ function doStockSell(){
     addTx(s,total,`주식 매도: ${coName} ${qty}주 @${stk.price}`);
     toast(`매도 완료!`);
   }
+  if(isDbReady()) dbSaveStudent(s); // Firebase 저장 → 교사 화면 즉시 반영
   closeModal('modalStock');renderStock();updateNavBal();if(state.selectedStock)selectStock(state.selectedStock);
 }
 
@@ -2628,7 +2721,7 @@ function renderJob(){
   if(isSeatMgr){
     const allStudents=[...state.students].sort((a,b)=>a.id-b.id);
     const myChecked=(state.seatCleanChecks[s.id]||[]);
-    const totalChecked=myChecked.length;
+    const totalChecked=myChecked.length; // 검사 횟수 (1차/2차/3차 모두 포함)
     const peers=getSeatManagerAssignment(s);
     const peerNames=peers.map(p=>p.name).join(', ');
     const perfBg=totalChecked>=7?'#e8f7f0':totalChecked<3?'#fdeaea':'var(--bg)';
@@ -2648,7 +2741,7 @@ function renderJob(){
       // 카드 색상: 마지막 검사 결과 기준
       const cardBg=lastResult?(lastResult==='clean'?'#e8f7f0':'#fdeaea'):ss==='requested'?'#fffbe6':'var(--bg)';
       const cardBorder=lastResult?(lastResult==='clean'?'#2d9e6b':'#d94f4f'):ss==='requested'?'#e8b84b':'var(--border)';
-      const reqBadge=ss==='requested'?(isRecheckable?'<span style="font-size:10px;background:#e8b84b;color:#1a3a5c;border-radius:4px;padding:1px 5px;margin-left:4px">재요청</span>':'<span style="font-size:10px;background:#e8b84b;color:#1a3a5c;border-radius:4px;padding:1px 5px;margin-left:4px">요청</span>'):'';
+      const reqBadge=ss==='requested'?'<span style="font-size:10px;background:#e8b84b;color:#1a3a5c;border-radius:4px;padding:1px 5px;margin-left:4px">요청완료</span>':'';
       const resultBadge=lastResult&&!canCheck
         ?'<span style="font-size:10px;background:'+(lastResult==='clean'?'#2d9e6b':'#d94f4f')+';color:white;border-radius:4px;padding:1px 5px;margin-left:4px">'+(lastResult==='clean'?'✅완료':'❌불합격')+'</span>'
         :'';
@@ -2793,7 +2886,7 @@ function requestSeatCheck(studentId){
   state.seatRecheckable[studentId]=true; // 이 학생은 재검사 가능 상태
   state.seatStatus[studentId]='requested';
   const s=state.students.find(x=>x.id===studentId);
-  toast(s.name+' 자리 검사 재요청! 자리청소관리자가 확인합니다.');
+  const isFirst2=!state.seatRecheckable[studentId];toast(s.name+(isFirst2?' 검사 요청! 자리청소관리자가 확인합니다.':' 재요청 완료! 자리청소관리자가 확인합니다.'));
   dbSaveSeatStatus(studentId,'requested');
   renderJob();
 }
@@ -3478,29 +3571,61 @@ async function confirmBulk(){
 
 // ==================== TEACHER GIVE ====================
 function renderTeachGive(){
+  const stuChecks=state.students.map(s=>`<label style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer"><input type="checkbox" class="tcSelCheck" value="${s.id}" style="width:16px;height:16px"><div class="ava" style="width:26px;height:26px;font-size:11px;flex-shrink:0">${s.name[0]}</div><span style="font-size:13px;font-weight:600;flex:1">${s.name}</span><span style="font-size:12px;color:var(--muted)">${s.balance.toLocaleString()} ${C()}</span></label>`).join('');
   document.getElementById('teach-give').innerHTML=`
-  <div class="grid-2">
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-title">💰 전체 일괄</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input type="number" class="fi2" id="tcAllAmt" placeholder="금액" style="width:100px">
+      <input type="text" class="fi2" id="tcAllReason" placeholder="사유" style="flex:1;min-width:120px">
+      <button class="btn btn-s" onclick="teachGiveAll(1)">전체 지급</button>
+      <button class="btn btn-d" onclick="teachGiveAll(-1)">전체 차감</button>
+    </div>
+  </div>
+  <div class="grid-2" style="gap:12px">
     <div class="card">
       <div class="card-title">개별 지급/차감</div>
       <div class="fg"><div class="fl2"><label>학생</label><select class="fi2" id="tcSel">${state.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div></div>
       <div class="fg"><div class="fl2"><label>금액</label><input type="number" class="fi2" id="tcAmt" placeholder="0" min="1"></div></div>
       <div class="fg"><div class="fl2"><label>사유</label><input type="text" class="fi2" id="tcReason" placeholder="예: 숙제 제출, 발표 우수"></div></div>
-      <div style="display:flex;gap:8px">
+      <div style="display:flex;gap:8px;margin-bottom:10px">
         <button class="btn btn-s" style="flex:1" onclick="teachGive(1)">지급</button>
         <button class="btn btn-d" style="flex:1" onclick="teachGive(-1)">차감</button>
       </div>
+      <button class="btn btn-p" style="width:100%" onclick="paySalaries()">💰 월급 지급</button>
     </div>
     <div class="card">
-      <div class="card-title">전체 일괄 지급/차감</div>
-      <div class="fg"><div class="fl2"><label>금액</label><input type="number" class="fi2" id="tcAllAmt" placeholder="0"></div></div>
-      <div class="fg"><div class="fl2"><label>사유</label><input type="text" class="fi2" id="tcAllReason" placeholder="예: 청소 완료"></div></div>
-      <div style="display:flex;gap:8px;margin-bottom:12px">
-        <button class="btn btn-s" style="flex:1" onclick="teachGiveAll(1)">전체 지급</button>
-        <button class="btn btn-d" style="flex:1" onclick="teachGiveAll(-1)">전체 차감</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div class="card-title" style="margin-bottom:0">선택 지급/차감</div>
+        <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px">
+          <input type="checkbox" id="tcCheckAll" onchange="document.querySelectorAll('.tcSelCheck').forEach(c=>c.checked=this.checked)" style="width:14px;height:14px"> 전체선택
+        </label>
       </div>
-      <button class="btn btn-p" style="width:100%" onclick="paySalaries()">💰 월급 지급 (17일 실행)</button>
+      <div style="max-height:200px;overflow-y:auto;margin-bottom:10px">${stuChecks}</div>
+      <div class="fg"><div class="fl2"><label>금액</label><input type="number" class="fi2" id="tcSelAmt" placeholder="0"></div></div>
+      <div class="fg"><div class="fl2"><label>사유</label><input type="text" class="fi2" id="tcSelReason" placeholder="사유"></div></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-s" style="flex:1" onclick="teachGiveSel(1)">선택 지급</button>
+        <button class="btn btn-d" style="flex:1" onclick="teachGiveSel(-1)">선택 차감</button>
+      </div>
     </div>
   </div>`;
+}
+function teachGiveSel(sign){
+  const amt=parseInt(document.getElementById('tcSelAmt').value);
+  const reason=document.getElementById('tcSelReason').value||(sign>0?'교사 지급':'교사 차감');
+  if(!amt||amt<=0)return toast('금액 입력');
+  const ids=[...document.querySelectorAll('.tcSelCheck:checked')].map(c=>parseInt(c.value));
+  if(!ids.length)return toast('학생을 선택하세요');
+  ids.forEach(id=>{
+    const s=state.students.find(x=>x.id===id);if(!s)return;
+    if(sign>0){s.balance+=amt;addTx(s,amt,'교사(선택): '+reason);}
+    else{const actual=Math.min(amt,s.balance);s.balance=Math.max(0,s.balance-amt);if(actual>0)addTx(s,-actual,'교사(선택): '+reason);}
+    if(isDbReady()) dbSaveStudent(s);
+  });
+  updateNavBal();
+  toast(ids.length+'명 '+amt.toLocaleString()+C()+' '+(sign>0?'지급':'차감')+' 완료');
+  renderTeachGive();
 }
 function teachGive(sign){
   const id=parseInt(document.getElementById('tcSel').value);
@@ -4029,7 +4154,7 @@ function renderTeachShop(){
   document.getElementById('teach-shop').innerHTML=`
   ${pendingHtml}
   <div class="card">
-    <div class="sec-head"><div class="sec-title">상점 관리</div><button class="btn btn-p btn-sm2" onclick="openModal('modalAddItem')">+ 추가</button></div>
+    <div class="sec-head"><div class="sec-title">상점 관리</div><button class="btn btn-p btn-sm2" onclick="document.getElementById('niEditId').value='';document.getElementById('niName').value='';document.getElementById('niEmoji').value='';document.getElementById('niPrice').value='50';document.getElementById('niStock').value='10';document.getElementById('niDesc').value='';if(document.getElementById('niTaxOnly'))document.getElementById('niTaxOnly').checked=false;openModal('modalAddItem')">+ 추가</button></div>
     ${state.storeItems.map(item=>`<div class="li">
       <div style="font-size:20px">${item.emoji}</div>
       <div style="flex:1">
@@ -4039,6 +4164,7 @@ function renderTeachShop(){
       <div style="font-size:13px;font-weight:600;color:var(--primary)">${item.price} ${C()}</div>
       <div style="font-size:12px;color:var(--muted);margin-left:8px">재고 ${item.stock}</div>
       <button class="btn btn-o btn-sm2" style="margin-left:6px" onclick="restockItem(${item.id})">+10</button>
+      <button class="btn btn-a btn-sm2" style="margin-left:4px" onclick="openEditItem(${item.id})">편집</button>
       <button class="btn btn-d btn-sm2" style="margin-left:4px" onclick="removeItem(${item.id})">삭제</button>
     </div>`).join('')}
   </div>`;
@@ -4060,12 +4186,32 @@ function addStoreItem(){
   const stock=parseInt(document.getElementById('niStock').value)||10;
   const desc=document.getElementById('niDesc').value||'';
   const fundItem=document.getElementById('niTaxOnly')?.checked||false;
+  const editId=document.getElementById('niEditId')?.value;
   if(!name)return toast('이름 입력');
-  const id=Math.max(0,...state.storeItems.map(x=>x.id))+1;
-  state.storeItems.push({id,name,emoji,price,stock,desc,fundItem});
-  toast(`${emoji} ${name} 추가됨`);
+  if(editId){
+    // 편집 모드
+    const item=state.storeItems.find(x=>x.id===parseInt(editId));
+    if(item){Object.assign(item,{name,emoji,price,desc,fundItem});toast(`${emoji} ${name} 수정됨`);}
+  } else {
+    // 신규 추가
+    const id=Math.max(0,...state.storeItems.map(x=>x.id))+1;
+    state.storeItems.push({id,name,emoji,price,stock,desc,fundItem});
+    toast(`${emoji} ${name} 추가됨`);
+  }
+  if(isDbReady()) state.storeItems.forEach(i=>fbSet('store_items',i.id,{id:i.id,name:i.name,emoji:i.emoji,price:i.price,stock:i.stock,description:i.desc,tax_only:i.fundItem||false}));
   closeModal('modalAddItem');
   renderTeachShop();
+}
+function openEditItem(id){
+  const item=state.storeItems.find(x=>x.id===id);if(!item)return;
+  document.getElementById('niEditId').value=id;
+  document.getElementById('niName').value=item.name;
+  document.getElementById('niEmoji').value=item.emoji||'📦';
+  document.getElementById('niPrice').value=item.price;
+  document.getElementById('niStock').value=item.stock;
+  document.getElementById('niDesc').value=item.desc||'';
+  if(document.getElementById('niTaxOnly')) document.getElementById('niTaxOnly').checked=!!(item.fundItem||item.taxOnly);
+  openModal('modalAddItem');
 }
 
 // ==================== SETTINGS ====================
@@ -4133,6 +4279,19 @@ function renderTeachSettings(){
     <div class="settings-st" style="color:var(--danger)">⚠️ 위험 구역 — 학생 데이터 초기화</div>
     <p style="font-size:13px;color:var(--muted);margin-bottom:14px">기존 DB의 학생 전체를 삭제하고 코드에 등록된 22명을 새로 등록합니다.<br>잔액·거래내역·포트폴리오가 <b>모두 초기화</b>됩니다. 신중하게 사용하세요.</p>
     <button id="btnResetStudents" class="btn btn-d" style="width:100%" onclick="resetAndSeedStudents()">🔄 DB 학생 전체 초기화 후 22명 재등록</button>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="settings-st">📈 주식 종목별 시간당 트렌드 (%)</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px">양수=상승↑ 음수=하락↓ / 예: -0.5 = 시간당 -0.5% 하락 / 비워두면 기본값 적용</div>
+    <div class="grid-2" style="gap:8px">
+      ${COMPANIES.map(co=>{
+        const cur=(cfg.stockTrendEach&&cfg.stockTrendEach[co.code]!==undefined)?(cfg.stockTrendEach[co.code]*100).toFixed(2):'';
+        const typeLabel={blue:'🔵우량',volatile:'🔴고변동',mid:'🟡중형',steady:'🟦펀드',giant:'⚫대형'}[co.volType]||'';
+        const desc={'KST':'안정 금융주','GBF':'바이오 우량','SKF':'식품 우량','HNT':'통신 배당','TRN':'물류 경기','HMT':'자동차 수출','SFC':'농업 저변동','DGM':'미디어 성장','NXG':'게임 급등락','CRP':'블록체인 투기','KAI':'AI 테마주','BTC':'바이오 신약','MDC':'의료 중변동','SLR':'태양에너지','KHB':'건설 경기','SNM':'패션 소비재','SPX':'항공우주','WVR':'관광 계절','NRG':'에너지 자원','ZBX':'보안 방어','KIF':'인덱스펀드','WDF':'글로벌펀드','HKE':'반도체 성장','KDP':'디스플레이'}[co.code]||'';
+        return '<div class="fg"><div class="fl2"><label style="font-size:11px;line-height:1.3">'+typeLabel+' <b>'+co.name+'</b><br><span style="color:var(--muted);font-size:10px">'+desc+'</span></label><input type="number" step="0.1" class="fi2 stEachInput" data-code="'+co.code+'" value="'+cur+'" placeholder="기본값" style="margin-top:2px"></div></div>';
+      }).join('')}
+    </div>
+    <button class="btn btn-a" style="width:100%;margin-top:10px" onclick="saveStockTrendEach()">📈 종목별 트렌드 저장</button>
   </div>`;
   updateCfgPreview();
   ['cfGrade','cfClass','cfBank','cfCoin','cfSymbol'].forEach(id=>{
@@ -4179,6 +4338,28 @@ function giveRoiPrizes(){
   toast('🏆 상금 지급 완료! '+msg+'수익률 기록 초기화됨');
   updateNavBal();
   renderTeachSettings();
+}
+function saveStockTrendEach(){
+  if(!cfg.stockTrendEach) cfg.stockTrendEach={};
+  document.querySelectorAll('.stEachInput').forEach(el=>{
+    const code=el.dataset.code;
+    const val=el.value.trim();
+    if(val===''||val===null){delete cfg.stockTrendEach[code];}
+    else{cfg.stockTrendEach[code]=parseFloat(val)/100;}
+  });
+  // stock_trend_each만 별도 저장
+  if(isDbReady()) db.collection('config').doc('1').set({
+    stock_trend:{},
+    stock_trend_each:cfg.stockTrendEach
+  });
+  // 주식 설정도 stocks/__stock_config 에 저장 (서버 차단 적용)
+  if(isDbReady()) fbSet('stocks','__stock_config',{
+    stock_trend:{},
+    stock_trend_each:cfg.stockTrendEach,
+    allow_stock:cfg.allowStock,
+    force_market:cfg.forceMarket
+  });
+  toast('📈 종목별 트렌드 저장됨 (다음 정각부터 적용)');
 }
 function updateCfgPreview(){
   const g=document.getElementById('cfGrade')?.value||cfg.grade;
@@ -4605,7 +4786,7 @@ function mergeSeatHistory(incoming){
   });
 }
 function recordSeatCheck(managerId, studentId, result){
-  // 실적 기록 - 재요청 후 재검사 시 카운트 추가
+  // 실적 기록 - 검사할 때마다 카운트 +1 (중복 포함, 1차/2차/3차)
   if(!state.seatCleanChecks[managerId]) state.seatCleanChecks[managerId]=[];
   state.seatCleanChecks[managerId].push(studentId);
   dbSaveSeatChecks(managerId);
@@ -4737,7 +4918,9 @@ function renderTeachClean(){
         grid+='<div style="text-align:center;padding:7px 2px;font-size:12px;border-radius:6px;color:'+(dow===0?'#ffaaaa':'#aabbff')+';background:#f8f8f8">'+d+'</div>';
       } else {
         // 평일: 클릭 가능
-        grid+='<div onclick="toggleCleanDate(this.dataset.d)" data-d="'+dateStr+'" style="text-align:center;padding:7px 2px;font-size:12px;font-weight:'+(isOn?'700':'400')+';border-radius:6px;cursor:pointer;border:1.5px solid '+(isToday?'var(--accent)':isOn?'var(--primary)':'transparent')+';background:'+(isOn?'var(--primary)':'var(--card)')+';color:'+(isOn?'white':isToday?'var(--accent)':'var(--text)')+'">'+d+'</div>';
+        const todayStyle=isToday?'font-size:13px;font-weight:900;border:2.5px solid #e53935;color:'+(isOn?'white':'#e53935')+';background:'+(isOn?'var(--primary)':'#fff3f3'):
+          'font-weight:'+(isOn?'700':'400')+';border:1.5px solid '+(isOn?'var(--primary)':'transparent')+';background:'+(isOn?'var(--primary)':'var(--card)')+';color:'+(isOn?'white':'var(--text)');
+        grid+='<div onclick="toggleCleanDate(this.dataset.d)" data-d="'+dateStr+'" style="text-align:center;padding:7px 2px;font-size:12px;border-radius:6px;cursor:pointer;'+todayStyle+'">'+d+(isToday?'<br><span style="font-size:8px">오늘</span>':'')+'</div>';
       }
     }
     grid+='</div>';
@@ -4774,7 +4957,10 @@ function renderTeachClean(){
 
   el.innerHTML=coinEditHtml+`
   <div class="card" style="margin-bottom:16px">
-    <div class="card-title">📅 청소 요일 설정</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="card-title" style="margin-bottom:0">📅 청소 요일 설정</div>
+      <button class="btn btn-d btn-sm2" onclick="manualResetCleanStatus()">↺ 청소 기록 초기화</button>
+    </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${daysHtml}</div>
     <div style="font-size:13px;color:${cleaningOn?'var(--success)':'var(--danger)'};font-weight:600">
       ${cleaningOn?'✅ 오늘은 청소 날입니다':'⛔ 오늘은 청소 날이 아닙니다 — 청소 시스템 비활성화'}
@@ -4963,6 +5149,20 @@ function saveCleanCoinAmounts(){
   toast('💰 코인 금액 저장 완료! 모든 학생 규칙에 반영됩니다.');
   renderTeachRulesInline();
 }
+function manualResetCleanStatus(){
+  if(!confirm('모든 청소 기록(청소상태, 자리청소, 검사이력)을 초기화합니까?'))return;
+  // 청소 상태 초기화
+  state.cleanStatus={};state.recycleStatus={};state.tabletStatus={};
+  state.seatStatus={};state.seatCleanChecks={};state.seatCheckHistory={};state.seatRecheckable={};
+  if(isDbReady()){
+    db.collection('clean_status').get().then(s=>s.docs.forEach(d=>d.ref.delete()));
+    db.collection('seat_status').get().then(s=>s.docs.forEach(d=>d.ref.delete()));
+    db.collection('seat_clean_checks').get().then(s=>s.docs.forEach(d=>d.ref.delete()));
+    db.collection('seat_check_history').doc('today').delete();
+  }
+  toast('✅ 청소 기록 초기화 완료');
+  refreshCleanPages();
+}
 function toggleCleanDay(dayIndex){ toggleCleanDate(todayKey()); }// legacy - unused
 
 
@@ -4992,6 +5192,12 @@ setInterval(()=>{
 // high 종목: 처음 앱 시작 후 경과된 10분 틱 수 추적
 // ── 결정론적 난수 생성 (seed 기반) ──
 // 같은 seed → 모든 기기에서 완전히 동일한 난수 → 동일한 주가
+// 주가 안전 파싱: NaN/Infinity/2000초과 방어
+function safePrice(p, fallback){
+  const v=parseFloat(p);
+  if(!isFinite(v)||isNaN(v)||v<=0) return fallback||100;
+  return Math.min(Math.round(v), 2000);
+}
 function mulberry32(seed){
   let t=seed+0x6D2B79F5;
   t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);
@@ -5006,86 +5212,108 @@ function getStockTimeSeed(){
   return Math.floor(Date.now()/3600000); // 1시간마다 바뀜
 }
 
-// high 종목의 틱: 당일 09:00 기준 몇 번째 10분인지 계산 (전 기기 동일)
-function getHighTick(){
-  const now=new Date();
-  const dayStart=new Date(now.getFullYear(),now.getMonth(),now.getDate(),9,0,0);
-  return Math.floor((now-dayStart)/3600000); // 09:00 기준 경과 틱 (1시간 단위)
+// getHighTick 제거됨
+
+let _lastStockSeed=0;
+let _stockDbLoaded=false;
+let _manualStockTime=0;
+
+function calcNextPrice(co, ci, stk, timeSeed){
+  const prev=Math.min(Math.max(5,stk.price||100),2000);
+  // todayOpen이 현재가의 50%~200% 범위 벗어나면 현재가를 기준으로 사용
+  const _rawOpen=stk.todayOpen?Math.min(Math.max(5,stk.todayOpen),2000):prev;
+  const open=(_rawOpen>=prev*0.5&&_rawOpen<=prev*2)?_rawOpen:prev;
+
+  // ── 교사 설정 우선 ──
+  const te=(cfg.stockTrendEach||{})[co.code];
+  const tt=(cfg.stockTrend||{})[co.volType];
+  if(te!==undefined||tt!==undefined){
+    const tv=te!==undefined?te:tt;
+    let np=Math.round(prev*(1+tv));
+    // 교사 설정도 1회 최대 ±20% cap
+    np=Math.min(Math.round(prev*1.20),Math.max(Math.round(prev*0.80),np));
+    return Math.max(5,Math.min(2000,np));
+  }
+
+  // ── 기본값 ──
+  const isUp=ci%2===0; // 짝수=상승, 홀수=하락
+  const pSeed=(seededRnd((timeSeed-1)*31+ci*99991)+1)/2; // 0~1, 이전seed
+
+  let np=prev;
+  switch(co.volType){
+
+    case 'blue':
+      // 절반 상승+0.5%/h / 절반 하락-0.5%/h, 하루 ±3%
+      np=Math.round(prev*(isUp?1.005:0.995));
+      np=Math.min(Math.round(open*1.03),Math.max(Math.round(open*0.97),np));
+      break;
+
+    case 'mid':
+      // 절반 상승+0.8%/h / 절반 하락-0.8%/h, 하루 ±5%
+      np=Math.round(prev*(isUp?1.008:0.992));
+      np=Math.min(Math.round(open*1.05),Math.max(Math.round(open*0.95),np));
+      break;
+
+    case 'volatile':
+      // 짝수: 40%확률 +5%, 60%확률 -15%
+      // 홀수: 20%확률 +5%, 80%확률 -15%
+      { const thr=isUp?0.60:0.80;
+        np=pSeed>thr ? Math.round(prev*1.05) : Math.round(prev*0.85);
+        np=Math.min(Math.round(open*1.20),Math.max(Math.round(open*0.80),np));
+      }
+      break;
+
+    case 'steady':
+      // 무조건 상승: 시간당 +0.15%, 하루 최대 +1.1%
+      np=prev+Math.max(1,Math.round(prev*0.0015));
+      np=Math.min(Math.round(open*1.011),np);
+      np=Math.max(prev+1,np); // 절대 내리지 않음
+      break;
+
+    case 'giant':
+      // 70%확률 +0.5%/h, 30%확률 -0.2%/h, 하루 ±3%
+      np=pSeed>0.30 ? Math.round(prev*1.005) : Math.round(prev*0.998);
+      np=Math.min(Math.round(open*1.03),Math.max(Math.round(open*0.97),np));
+      break;
+
+    default:
+      np=Math.round(prev*(isUp?1.005:0.995));
+  }
+
+  if(!isFinite(np)||isNaN(np)) return prev;
+  return Math.max(5,Math.min(2000,np));
 }
 
 setInterval(()=>{
-  if(!isMarketOpen()){
-    // 장 마감/주말에는 주가 변동 및 DB 저장 완전 차단
+  if(!isMarketOpen()||!_stockDbLoaded){
+    if(!isMarketOpen()) _lastStockSeed=0;
     return;
   }
   const timeSeed=getStockTimeSeed();
-  const highTick=getHighTick();
+  if(timeSeed===_lastStockSeed) return;
+  _lastStockSeed=timeSeed;
+
+  // ★ 교사만 주가 계산+저장. 학생은 onSnapshot으로만 수신
+  if(!session.isTeacher) return;
+
+  const todayStr=new Date().toLocaleDateString('ko-KR');
   COMPANIES.forEach((co,ci)=>{
-    const stk=state.stocks[co.code];
-    let dVol, dTrend;
-    if(co.volType==='high'){
-      dVol=0.15;
-      if(highTick<=15)      dTrend=+0.020;
-      else if(highTick<=20) dTrend=+0.002;
-      else if(highTick<=50) dTrend=-0.018;
-      else                  dTrend=-0.025;
-    } else {
-      const phase=getMarketPhase();
-      const mBias = phase==='bull' ? +0.002 : -0.002; // 시장 전체 편향 축소
-      const vp={
-        blue:     [0.015, mBias*0.5],     // 우량주: 변동 절반으로 축소
-        volatile: [0.07,  mBias*1.5],     // 고변동: 변동 절반으로 축소
-        mid:      [0.035, mBias*1.0],     // 중형주: 변동 절반으로 축소
-        steady:   [0.001, +0.002],        // 펀드형: 변동 최소, 하루 약 2% 우상향
-        giant:    [0.01,  +0.0003],       // 삼성전자형: 우상향 편향 대폭 축소
-      }[co.volType]||[0.025, mBias];
-      [dVol,dTrend]=vp;
+    const stk=state.stocks[co.code]; if(!stk) return;
+    if(!stk.todayOpen||stk.todayDate!==todayStr||stk.todayOpen<5){
+      stk.todayOpen=Math.min(Math.max(5,stk.price||100),2000);
+      stk.todayDate=todayStr;
     }
-    // seed = 시간(10분 단위) + 종목 인덱스 → 모든 기기에서 동일
-    // 단기 매매 손실 유도: volatile/mid는 직전 상승 후 하락 편향
-    const prevRnd=seededRnd((timeSeed-1)*37+ci*1000003);
-    const shortTermPenalty=(co.volType==='volatile'||co.volType==='mid')&&prevRnd>0.3?-0.15:0;
-    const baseRnd=seededRnd(timeSeed*37+ci*1000003)+shortTermPenalty; // 직전 상승 시 하락 편향
-    // 뉴스 sentiment 70% 반영: pos→양수 편향, neg→음수 편향
-    const sentiment=getTodayNewsSentiment(co.code);
-    let rnd;
-    if(sentiment==='pos'){
-      // 70% 확률로 양수 방향: baseRnd를 양수 쪽으로 편향
-      rnd=baseRnd>0 ? baseRnd : (Math.abs(baseRnd)*0.3*Math.sign(baseRnd));
-    } else if(sentiment==='neg'){
-      // 70% 확률로 음수 방향
-      rnd=baseRnd<0 ? baseRnd : (Math.abs(baseRnd)*0.3*Math.sign(baseRnd));
-    } else {
-      rnd=baseRnd; // 중립: 그대로
-    }
-    // 고변동주: 하루 최대 20% cap 적용 (오늘 첫 가격 기준)
-    const dailyStart = stk.daily.length>=2 ? stk.daily[stk.daily.length-2] : stk.price;
-    const rawNp = Math.round(stk.price*(1+rnd*dVol+dTrend));
-    let np = rawNp;
-    if(co.volType==='volatile'){
-      // 하루 최대 ±15% cap
-      const maxUp = Math.round(dailyStart*1.15);
-      const maxDn = Math.max(5, Math.round(dailyStart*0.85));
-      np = Math.min(maxUp, Math.max(maxDn, rawNp));
-      // 절대 상한: 초기가의 500% 또는 99,999코인 중 작은 값
-      const initPrice = stk.daily[0]||100;
-      const maxAbs = Math.min(initPrice*5, 99999);
-      np = Math.min(np, maxAbs);
-      // NaN/Infinity 방어
-      if(!isFinite(np)||isNaN(np)) np=dailyStart||100;
-    }
-    np = Math.max(5, np);
-    stk.prevClose=stk.price;
-    stk.daily.push(np);
-    if(stk.daily.length>31)stk.daily.shift(); // 31개 유지 (오늘 하루치)
+    const np=calcNextPrice(co,ci,stk,timeSeed);
+    stk.prevClose=Math.min(Math.max(5,stk.price||100),2000);
     stk.price=np;
-    stk.daily[stk.daily.length-1]=np; // 마지막값=현재가 항상 일치
+    stk.daily.push(np);
+    if(stk.daily.length>31) stk.daily.shift();
+    stk.daily[stk.daily.length-1]=np;
   });
-  // DB에 저장 — daily 포함 저장으로 차트 일관성 유지
   if(isDbReady()) COMPANIES.forEach(co=>dbSaveStock(co.code));
   if(document.getElementById('page-stock')?.classList.contains('active')){renderStockList();if(state.selectedStock)selectStock(state.selectedStock);}
   updateNavBal();
-},3600000); // 1시간마다 주가 변동 (seed 기반 — 전 기기 동일)
+},60000);
 
 setInterval(()=>{
   if(document.getElementById('page-stock')?.classList.contains('active'))updateMarketStatus();
@@ -5672,15 +5900,14 @@ function toggleTaskDone(taskId, studentId){
     if(isDbReady()) fbDel('task_done',key);
     // 제출물 카테고리: 취소 시 코인 차감
     const task=state.tasks.find(t=>t.id===taskId);
-    if(task&&task.category==='submit'){
-      const s=state.students.find(x=>x.id===sid);
-      if(s){
-        const reward=cfg.taskSubmitReward||10;
-        s.balance-=reward;
-        addTx(s,-reward,'📋 제출물 취소 -'+reward+'코인');
-        updateNavBal();
-        if(isDbReady()) dbSaveStudent(s);
-      }
+    const task2=state.tasks.find(t=>t.id===taskId);
+    const s2=state.students.find(x=>x.id===sid);
+    if(task2&&s2){
+      const reward=cfg.taskSubmitReward||10;
+      s2.balance=Math.max(0,s2.balance-reward);
+      addTx(s2,-reward,'↩️ 과제 취소 -'+reward+'코인 ['+task2.title+']');
+      updateNavBal();
+      if(isDbReady()) dbSaveStudent(s2);
     }
     toast('↩️ 제출 취소됨');
     if(document.getElementById('teachTaskCatContent')) renderTeachTaskCatContent();
@@ -5692,24 +5919,26 @@ function toggleTaskDone(taskId, studentId){
 }
 
 function markTaskDone(taskId, studentId){
-  const sid=parseInt(studentId)||studentId; // 숫자로 통일
+  const sid=parseInt(studentId)||studentId;
   const key=taskId+'_'+sid;
-  // 이미 완료된 경우 코인 중복 지급 방지
   if(state.taskDoneStatus[key]) return;
-  state.taskDoneStatus[key]=true;
-  if(isDbReady()) fbSet('task_done',key,{done:true,updated_at:new Date().toISOString()});
+  // 삭제된 과제는 코인 지급 불가
   const task=state.tasks.find(t=>t.id===taskId);
-  if(task&&task.category==='submit'){
-    const s=state.students.find(x=>x.id===sid);
-    if(s){
-      const reward=cfg.taskSubmitReward||10;
-      s.balance+=reward;
-      addTx(s,reward,'📋 제출물 완료 보상 +'+reward+'코인');
-      if(isDbReady()) dbSaveStudent(s);
-      updateNavBal();
-      toast('✅ 제출 완료! +'+reward+'코인 지급');
-      return;
-    }
+  if(!task||task.deletedAt){toast('삭제된 과제입니다');return;}
+  state.taskDoneStatus[key]=true;
+  if(isDbReady()) fbSet('task_done',key,{done:true,student_id:String(sid),updated_at:new Date().toISOString()});
+  const s=state.students.find(x=>x.id===sid);
+  if(task&&s){
+    const reward=cfg.taskSubmitReward||10;
+    s.balance+=reward;
+    addTx(s,reward,'✅ 과제 완료 보상 +'+reward+'코인 ['+task.title+']');
+    if(isDbReady()) dbSaveStudent(s);
+    updateNavBal();
+    toast('✅ 완료! +'+reward+'코인 지급');
+    if(document.getElementById('teachTaskCatContent')) renderTeachTaskCatContent();
+    if(document.getElementById('taskCatContent')) renderTaskCatContent();
+    if(document.getElementById('homeContent')) renderHome();
+    return;
   }
   toast('✅ 완료!'+(task?(' ['+task.title+']'):''));
 }
@@ -5855,7 +6084,7 @@ async function dbLoadItemUseRequests(){
       return {studentId:r.student_id,itemId:r.item_id,itemName:r.item_name,
         itemEmoji:r.item_emoji,studentName:r.student_name,reqId:r.req_id};
     });
-  }catch(e){console.warn('item_use_requests 로드 오류',e);}
+  }catch(e){}
 }
 async function dbLoadTasks(){
   if(!isDbReady())return;
@@ -5888,7 +6117,7 @@ async function dbLoadTasks(){
     });
     const doneSnap=await db.collection('task_done').get(); const doneData=doneSnap.docs.map(d=>({task_student_id:d.id,...d.data()}));
     if(doneData) doneData.forEach(r=>{state.taskDoneStatus[r.task_student_id]=r.done;});
-  }catch(e){console.warn('tasks 로드 실패(테이블 없으면 무시):',e);}
+  }catch(e){}
 }
 
 // ==================== 의무 과제 미수행 자동 차감 (10:40) ====================
@@ -5932,6 +6161,19 @@ populateLoginStudentSel();
 applyLoginInfo();
 
 // ==================== SUPABASE DB LAYER ====================
+// 화면 자동 꺼짐 방지 (PWA 장시간 사용 시 로그아웃 방지)
+(async()=>{
+  try{
+    if('wakeLock' in navigator){
+      let _wl=await navigator.wakeLock.request('screen');
+      document.addEventListener('visibilitychange',async()=>{
+        if(document.visibilityState==='visible'){
+          try{_wl=await navigator.wakeLock.request('screen');}catch(e){}
+        }
+      });
+    }
+  }catch(e){}
+})();
 function setDbStatus(status){
   const el=document.getElementById('dbStatusBadge');
   if(!el)return;
@@ -5944,6 +6186,19 @@ function setDbStatus(status){
 // ---- LOAD ALL STATE FROM DB ----
 async function loadStateFromDb(){
   if(!isDbReady())return false;
+  // 1단계: config 먼저 로드 (teacherPw - 반드시 성공해야 함)
+  try{
+    const cfgRow=await fbGet('config','1');
+    if(cfgRow && cfgRow.teacher_pw){
+      const isHash = pw => typeof pw==='string' && /^[0-9a-f]{64}$/.test(pw);
+      if(isHash(cfgRow.teacher_pw)||cfgRow.teacher_pw.startsWith('pbkdf2$')){
+        cfg.teacherPw=cfgRow.teacher_pw;
+      } else {
+        cfg.teacherPw=await hashPw(cfgRow.teacher_pw);
+      }
+    }
+  }catch(e){}
+  // 2단계: 전체 로드
   try{
     setDbStatus('connecting');
     // 1. config
@@ -5970,6 +6225,16 @@ async function loadStateFromDb(){
       cfg.allowStock=cfgRow.allow_stock??cfg.allowStock;
       cfg.allowStore=cfgRow.allow_store??cfg.allowStore;
       cfg.showBalance=cfgRow.show_balance??cfg.showBalance;
+      // stock_trend: 값이 있어도 mid:-0.5 같은 이상값이면 무시
+      if(cfgRow.stock_trend&&Object.keys(cfgRow.stock_trend).length>0){
+        const st=cfgRow.stock_trend;
+        // 모든 값이 -0.1 이하면 낡은 하락 설정 → 무시
+        const vals=Object.values(st).filter(v=>typeof v==='number');
+        const allNeg=vals.length>0&&vals.every(v=>v<=-0.1);
+        if(!allNeg) cfg.stockTrend=st;
+        else { cfg.stockTrend={}; }
+      }
+      if(cfgRow.stock_trend_each) cfg.stockTrendEach=cfgRow.stock_trend_each;
       cfg.forceMarket=cfgRow.force_market??cfg.forceMarket;
       if(cfgRow.cleaning_days)cfg.cleaningDays=cfgRow.cleaning_days;
       if(cfgRow.coin_amounts)cfg.coinAmounts=Object.assign({},cfg.coinAmounts,cfgRow.coin_amounts);
@@ -6040,20 +6305,36 @@ async function loadStateFromDb(){
       state.storeItems=items.map(r=>({id:r.id,name:r.name,emoji:r.emoji,price:r.price,stock:r.stock,desc:r.description||'',fundItem:r.tax_only||false}));
     }
     // 5. stocks
-    const stocks=await fbGetAll('stocks');
+    const stocks=await fbGetAll('stocks').catch(()=>[]);
     if(stocks&&stocks.length){
       const loadedCodes=new Set(stocks.map(r=>r.code));
       stocks.forEach(r=>{
         if(state.stocks[r.code]){
-          state.stocks[r.code].price=r.price;
-          state.stocks[r.code].prevClose=r.prev_close;
-          // DB에 daily가 있으면 로드 (차트 일관성 유지)
+          const _loadPrice=safePrice(r.price, state.stocks[r.code].price);
+          state.stocks[r.code].price=_loadPrice;
+          // prevClose: 현재가의 130% 초과하면 현재가와 동일하게 (이상값 방지)
+          const _loadPrev=safePrice(r.prev_close, _loadPrice);
+          // prevClose가 현재가의 50%~130% 범위만 허용
+          state.stocks[r.code].prevClose=(_loadPrev>_loadPrice*1.30||_loadPrev<_loadPrice*0.50)?_loadPrice:_loadPrev;
+          if(r.todayOpen){
+            const fbOpen2=safePrice(r.todayOpen,_loadPrice);
+            state.stocks[r.code].todayOpen=(fbOpen2>=_loadPrice*0.5&&fbOpen2<=_loadPrice*2)?fbOpen2:_loadPrice;
+          }
+          // DB에 daily가 있으면 로드
           if(r.daily&&r.daily.length>0){
-            state.stocks[r.code].daily=r.daily;
-            // daily 마지막값 = 현재가, 마지막-1값 = 전일종가로 맞춤
-            const dl=state.stocks[r.code].daily;
-            dl[dl.length-1]=r.price;
-            if(dl.length>1) dl[dl.length-2]=r.prev_close;
+            const rawDaily=r.daily.map(v=>safePrice(v,_loadPrice));
+            // daily 평균이 현재가의 2배 이상이면 옛날 데이터 → 현재가로 리셋
+            const avg=rawDaily.reduce((a,b)=>a+b,0)/rawDaily.length;
+            if(avg>_loadPrice*1.5||avg<_loadPrice*0.5){
+              // 불일치: daily를 현재가로 리셋
+              state.stocks[r.code].daily=Array(rawDaily.length).fill(_loadPrice);
+              state.stocks[r.code].todayOpen=_loadPrice;
+            } else {
+              state.stocks[r.code].daily=rawDaily;
+              const dl=state.stocks[r.code].daily;
+              dl[dl.length-1]=_loadPrice;
+              if(dl.length>1) dl[dl.length-2]=state.stocks[r.code].prevClose;
+            }
           }
           if(r.monthly&&r.monthly.length>0){
             state.stocks[r.code].monthly=r.monthly;
@@ -6077,10 +6358,21 @@ async function loadStateFromDb(){
       for(const c of COMPANIES){
         if(!loadedCodes.has(c.code)){
           const stk=state.stocks[c.code];
-          if(stk) fbSet('stocks',c.code,{code:c.code,price:stk.price,prev_close:stk.prevClose,daily:stk.daily.slice(-31)}).catch(()=>{});
+          if(stk&&session.isTeacher) fbSet('stocks',c.code,{code:c.code,price:stk.price,prev_close:stk.prevClose,daily:stk.daily.slice(-31)}).catch(()=>{});
         }
       }
     }
+    // 이상값 주가 자동 수정 (2000 초과 시 리셋)
+    COMPANIES.forEach(co=>{
+      const stk=state.stocks[co.code];
+      if(stk&&(stk.price>2000||!isFinite(stk.price)||isNaN(stk.price))){
+        stk.price=Math.min(stk.price,2000);
+        if(!isFinite(stk.price)||isNaN(stk.price)) stk.price=100;
+        if(isDbReady()&&session.isTeacher) dbSaveStock(co.code);
+      }
+    });
+    _stockDbLoaded=true; // DB 주가 로드 완료 → 이후부터 주가 변동 허용
+    _lastStockSeed=Math.floor(Date.now()/3600000); // 앱 로드 시 즉시 실행 방지 (다음 정각까지 대기)
     // 오늘 날짜 기준 (6·7·8번 공통 사용)
     const _todayStr=new Date().toISOString().slice(0,10); // YYYY-MM-DD
 
@@ -6138,7 +6430,6 @@ async function loadStateFromDb(){
     setDbStatus('online');
     return true;
   }catch(e){
-    console.error('DB 로드 실패',e);
     setDbStatus('error');
     return false;
   }
@@ -6158,6 +6449,7 @@ async function dbSaveStudent(s){
 }
 async function dbSaveConfig(){
   if(!isDbReady())return;
+  if(!session.isTeacher)return; // 학생은 설정 저장 불가
   window._savingConfig=true; // 저장 중 플래그 — onSnapshot 덮어쓰기 방지
   const data={grade:cfg.grade,class_num:cfg.classNum,bank_name:cfg.bankName,
     coin_name:cfg.coinName,coin_symbol:cfg.coinSymbol,
@@ -6166,6 +6458,7 @@ async function dbSaveConfig(){
     cleaning_days:cfg.cleaningDays,
     coin_amounts:cfg.coinAmounts,
     tax_settings:cfg.tax,
+    app_version:'202603311544',
     task_penalty:cfg.taskPenalty||10,
     task_submit_reward:cfg.taskSubmitReward||10,
     class_fund:cfg.classFund||0,
@@ -6176,9 +6469,15 @@ async function dbSaveConfig(){
   try{
     await fbSet('config','1',data);
   }finally{
-    // 저장 완료 후 플래그 해제 (2초 후 — onSnapshot 반영 대기)
     setTimeout(()=>{window._savingConfig=false;},2000);
   }
+  // 주식 설정은 별도로 저장 (실패해도 config 저장에 영향 없음)
+  try{
+    await fbSet('stocks','__stock_config',{
+      allow_stock:cfg.allowStock,
+      force_market:cfg.forceMarket,
+    });
+  }catch(e){}
 }
 async function dbSaveJob(j){
   if(!isDbReady())return;
@@ -6221,7 +6520,7 @@ async function dbSaveSeatChecks(managerId){
   await fbSet('seat_clean_checks',managerId,{manager_id:managerId,checked_ids:checks,history:historyData,updated_at:new Date().toISOString()});
   // history 별도 저장 (덮어쓰기 방지 — merge:true)
   if(isDbReady()&&Object.keys(historyData).length){
-    try{await db.collection('seat_check_history').doc('today').set({data:historyData,updated_at:new Date().toISOString()},{merge:false});}catch(e){}
+    try{await db.collection('seat_check_history').doc('today').set({data:historyData,updated_at:new Date().toISOString(),date:new Date().toLocaleDateString('ko-KR')},{merge:false});}catch(e){}
   }
 }
 async function dbLoadSeatChecks(todayStr){
@@ -6229,23 +6528,26 @@ async function dbLoadSeatChecks(todayStr){
   try{
     const sccSnap=await db.collection('seat_clean_checks').get(); const data=sccSnap.docs.map(d=>d.data());
     if(data){const todayKST=new Date().toLocaleDateString('ko-KR');data.forEach(r=>{const upKST=new Date(r.updated_at||0).toLocaleDateString('ko-KR');if(upKST===todayKST){state.seatCleanChecks[r.manager_id]=r.checked_ids||[];if(r.history)mergeSeatHistory(r.history);}});}
-    // 별도 history 컬렉션도 로드
     try{
       const hDoc=await db.collection('seat_check_history').doc('today').get();
-      if(hDoc.exists&&hDoc.data().data) mergeSeatHistory(hDoc.data().data);
+      if(hDoc.exists){const hd=hDoc.data();const _todayChk=new Date().toLocaleDateString('ko-KR');if(!hd.date||hd.date===_todayChk){if(hd.data)mergeSeatHistory(hd.data);}else{db.collection('seat_check_history').doc('today').delete();state.seatCheckHistory={};}}
     }catch(e){}
-  }catch(e){console.warn('seat_clean_checks 로드 실패:',e);}
+  }catch(e){}
 }
 async function dbSaveStock(code){
   if(!isDbReady())return;
+  if(!session.isTeacher)return; // 학생은 주가 저장 불가
   const stk=state.stocks[code];
-  // daily 마지막값을 항상 현재가로 맞춤 (차트-주가 일치)
   const dailyTrim=stk.daily.slice(-31);
   if(dailyTrim.length>0) dailyTrim[dailyTrim.length-1]=stk.price;
-  await fbSet('stocks',code,{code,price:stk.price,prev_close:stk.prevClose,daily:dailyTrim});
+  try{
+    await fbSet('stocks',code,{code,price:stk.price,prev_close:stk.prevClose,daily:dailyTrim,todayOpen:stk.todayOpen||stk.price});
+  }catch(e){} // auth 실패 무시 (교사 Custom Token 발급 전)
 }
 async function dbInitStocks(){
   if(!isDbReady())return;
+  if(!session.isTeacher)return; // 학생은 주가 초기화 불가
+  if(!session.isTeacher)return; // 학생은 주가 초기화 불가
   const existingSnap=await db.collection('stocks').get();
   const existingCodes=new Set(existingSnap.docs.map(d=>d.id));
   for(const c of COMPANIES){
@@ -6296,8 +6598,11 @@ function refreshCleanPages(){
     if(jobPage&&jobPage.classList.contains('active')) renderJob();
     const homePage=document.getElementById('page-home');
     if(homePage&&homePage.classList.contains('active')) renderHome();
+    // 학생이 어느 페이지에 있든 자리청소 상태 즉시 반영
+    const cleanSection=document.getElementById('seatCleanSection');
+    if(cleanSection) renderJob();
     if(session.isTeacher&&_currentTeachTab==='clean') renderTeachClean();
-  }, 50); // 50ms debounce - 여러 변경이 한꺼번에 오면 한 번만 렌더링
+  }, 50);
 }
 // onSnapshot: 접속자 수 × 컬렉션 수만큼 실시간 읽기 발생 → 하루 수백만 읽기
 // polling: 30초마다 1회 전체 로드 → 하루 약 2,880회 읽기 (약 1000배 절감)
@@ -6316,9 +6621,118 @@ function subscribeRealtime(){
     await pollChanges();
   }, 60000); // 1분마다 polling
 
+  // ── config: onSnapshot (교사 설정 즉시 전기기 반영) ──
+  if(window._configUnsubscribe) window._configUnsubscribe();
+  window._configUnsubscribe = db.collection('config').doc('1').onSnapshot(snap=>{
+    if(!session.loggedIn||window._savingConfig) return;
+    const r=snap.data();if(!r)return;
+    cfg.allowStock=r.allow_stock??cfg.allowStock;
+    cfg.allowTransfer=r.allow_transfer??cfg.allowTransfer;
+    cfg.allowStore=r.allow_store??cfg.allowStore;
+    cfg.showBalance=r.show_balance??cfg.showBalance;
+    cfg.forceMarket=r.force_market??cfg.forceMarket;
+    cfg.coinAmounts=r.coin_amounts||cfg.coinAmounts;
+    cfg.tax=r.tax_settings||cfg.tax;
+    cfg.cleaningDays=r.cleaning_days||cfg.cleaningDays;
+    // stock_trend: stocks/__stock_config onSnapshot에서 처리
+    cfg.stockTrendEach=r.stock_trend_each||cfg.stockTrendEach;
+    if(r.app_version&&r.app_version!=='202603311544'){
+      // 교사가 새 버전 배포 시 학생 화면 자동 새로고침
+      if(!session.isTeacher){
+        toast('📲 앱이 업데이트됩니다...');
+        setTimeout(()=>location.reload(true),1500);
+      }
+    }
+    applyGlobalCfg();
+    if(document.getElementById('page-stock')?.classList.contains('active')) renderStockList();
+  }, err=>{}); 
+  // ── students: onSnapshot (교사 지급/차감 즉시 학생 반영) ──
+  if(window._studentsUnsubscribe) window._studentsUnsubscribe();
+  if(window._myStudentUnsubscribe) window._myStudentUnsubscribe();
+  function _applyStudentData(r, docId){
+    const s=state.students.find(x=>String(x.id)===String(r.id||docId));
+    if(s){
+      s.balance=r.balance||0; s.transactions=r.transactions||[];
+      s.portfolio=convertPortfolio(r.portfolio||{});
+      s.items=r.items||[]; s.earned=r.earned||0; s.spent=r.spent||0; s.jobId=r.job_id;
+    }
+    updateNavBal();
+    if(document.getElementById('page-home')?.classList.contains('active')) renderHome();
+    if(session.isTeacher){
+      // 주식 탭 열려있으면 즉시 갱신
+      if(document.getElementById('page-stock')?.classList.contains('active')) renderStock();
+      // stockPortfolio DOM이 있으면 항상 갱신 (탭 무관)
+      const portfolioEl = document.getElementById('stockPortfolio');
+      if(portfolioEl) renderStockPortfolio();
+    }
+  }
+  if(session.isTeacher){
+    // 교사: 전체 students 구독
+    window._studentsUnsubscribe = db.collection('students').onSnapshot(snap=>{
+      if(!session.loggedIn) return;
+      snap.docChanges().forEach(change=>{
+        if(change.type==='removed') return;
+        _applyStudentData(change.doc.data(), change.doc.id);
+      });
+    }, err=>{});
+  } else if(session.studentId){
+    // 학생: 본인 문서 1건만 구독 (읽기 22배 절감)
+    window._myStudentUnsubscribe = db.collection('students').doc(String(session.studentId)).onSnapshot(snap=>{
+      if(!session.loggedIn||!snap.exists) return;
+      _applyStudentData(snap.data(), snap.id);
+    }, err=>{});
+  }
+  
+  // ── stocks: onSnapshot (주가 즉시 반영) ──
+  if(window._stocksUnsubscribe) window._stocksUnsubscribe();
+  window._stocksUnsubscribe = db.collection('stocks').onSnapshot(snap=>{
+    if(!session.loggedIn) return;
+    snap.docChanges().forEach(change=>{
+      if(change.type==='removed') return;
+      const r=change.doc.data();
+      const code=r.code||change.doc.id;
+      const stk=state.stocks[code];
+      // __stock_config 문서: 주식 설정 실시간 반영
+      if(code==='__stock_config'){
+        if(r.stock_trend&&Object.keys(r.stock_trend).length>0) cfg.stockTrend=r.stock_trend;
+        if(r.stock_trend_each) cfg.stockTrendEach=r.stock_trend_each;
+        if(r.allow_stock!==undefined) cfg.allowStock=r.allow_stock;
+        if(r.force_market!==undefined) cfg.forceMarket=r.force_market;
+        return;
+      }
+      if(stk){
+        // 항상 Firebase 값으로 동기화 → 교사/학생 동일 화면 보장
+        const newPrice=Math.min(safePrice(r.price,stk.price),2000);
+        stk.price=newPrice;
+        const fbPrev=safePrice(r.prev_close,newPrice);
+        stk.prevClose=Math.min(fbPrev,newPrice*1.3);
+        if(r.daily&&r.daily.length>0){
+          stk.daily=r.daily.map(v=>Math.min(safePrice(v,newPrice),2000));
+          stk.daily[stk.daily.length-1]=newPrice;
+        }
+        // todayOpen: 현재가의 50%~200% 범위만 허용 (이상값 방지)
+        if(r.todayOpen){
+          const fbOpen=safePrice(r.todayOpen,newPrice);
+          if(fbOpen>=newPrice*0.5&&fbOpen<=newPrice*2) stk.todayOpen=fbOpen;
+          else stk.todayOpen=newPrice; // 이상값이면 현재가로
+        }
+      }
+    });
+    if(document.getElementById('page-stock')?.classList.contains('active')){
+      renderStockList();
+      if(state.selectedStock) selectStock(state.selectedStock);
+    }
+    // 홈 화면도 갱신 (포트폴리오 평가액 변동)
+    if(document.getElementById('page-home')?.classList.contains('active')) renderHome();
+  }, err=>{}); 
   // ── clean_status: onSnapshot (청소일에만 필요, 변경 시에만 읽기) ──
   if(window._cleanStatusUnsubscribe) window._cleanStatusUnsubscribe();
-  window._cleanStatusUnsubscribe = db.collection('clean_status').onSnapshot(snap=>{
+  // clean_status: 교사=전체, 학생=본인 관련 문서만
+  const _cleanQuery = session.isTeacher
+    ? db.collection('clean_status')
+    : db.collection('clean_status').where('student_id','in',
+        [String(session.studentId||''), String(session.studentId||'')+'_r', String(session.studentId||'')+'_t']);
+  window._cleanStatusUnsubscribe = _cleanQuery.onSnapshot(snap=>{
     if(!session.loggedIn) return;
     snap.docChanges().forEach(change=>{
       const d=change.doc;
@@ -6333,9 +6747,10 @@ function subscribeRealtime(){
       applyCleanStatusRow(r);
     });
     refreshCleanPages();
-  }, err=>console.warn('clean_status 오류:',err));
-
+  }, err=>{}); 
   // ── seat_status: onSnapshot ──
+  if(_seatStatusUnsubscribe) _seatStatusUnsubscribe();
+  // seat_status: 자리청소관리자/교사=전체 구독, 나머지=구독 안함 (본인 자리만 로컬에 있으면 됨)
   if(_seatStatusUnsubscribe) _seatStatusUnsubscribe();
   _seatStatusUnsubscribe = db.collection('seat_status').onSnapshot(snap=>{
     if(!session.loggedIn) return;
@@ -6348,12 +6763,13 @@ function subscribeRealtime(){
         return;
       }
       const r=d.data();
+      const sid=parseInt(d.id)||d.id;
+      // 오늘 데이터만 반영, 단 requested 상태는 날짜 무관하게 반영
       const updKST=new Date(r.updated_at||0).toLocaleDateString('ko-KR');
-      if(updKST===todayKST){const sid=parseInt(d.id)||d.id;state.seatStatus[sid]=r.status;}
+      if(updKST===todayKST || r.status==='requested'){state.seatStatus[sid]=r.status;}
     });
     refreshCleanPages();
-  }, err=>console.warn('seat_status 오류:',err));
-
+  }, err=>{}); 
   // ── seat_clean_checks: onSnapshot ──
   if(window._seatCleanChecksUnsubscribe) window._seatCleanChecksUnsubscribe();
   window._seatCleanChecksUnsubscribe = db.collection('seat_clean_checks').onSnapshot(snap=>{
@@ -6364,14 +6780,15 @@ function subscribeRealtime(){
       const r=change.doc.data();
       const updKST=new Date(r.updated_at||0).toLocaleDateString('ko-KR');
       if(updKST===todayKST){
-        // 항상 Firebase 최신값 반영 (누락 방지)
-        state.seatCleanChecks[r.manager_id]=r.checked_ids||[];
+        // 더 긴 배열 유지 (로컬 push가 Firebase보다 앞설 수 있음)
+        const fbChecks=r.checked_ids||[];
+        const localChecks=state.seatCleanChecks[r.manager_id]||[];
+        state.seatCleanChecks[r.manager_id]=fbChecks.length>=localChecks.length?fbChecks:localChecks;
         if(r.history) mergeSeatHistory(r.history);
       }
     });
     refreshCleanPages();
-  }, err=>console.warn('seat_clean_checks 오류:',err));
-
+  }, err=>{}); 
   // ── seat_check_history: onSnapshot (검사 이력 실시간) ──
   if(window._seatHistoryUnsubscribe) window._seatHistoryUnsubscribe();
   window._seatHistoryUnsubscribe = db.collection('seat_check_history').onSnapshot(snap=>{
@@ -6379,11 +6796,11 @@ function subscribeRealtime(){
     snap.docChanges().forEach(change=>{
       if(change.type==='removed') return;
       const r=change.doc.data();
-      if(r.data) mergeSeatHistory(r.data);
+      const _hToday=new Date().toLocaleDateString('ko-KR');
+      if(!r.date||r.date===_hToday){if(r.data)mergeSeatHistory(r.data);}else{state.seatCheckHistory={};}
     });
     refreshCleanPages();
-  }, err=>console.warn('seat_check_history 오류:',err));
-
+  }, err=>{}); 
   // ── tasks: onSnapshot (교사 추가/삭제 즉시 학생 반영) ──
   if(window._tasksUnsubscribe) window._tasksUnsubscribe();
   window._tasksUnsubscribe = db.collection('tasks').onSnapshot(snap=>{
@@ -6403,11 +6820,14 @@ function subscribeRealtime(){
     if(document.getElementById('taskCatContent')) renderTaskCatContent();
     const hp=document.getElementById('page-home');
     if(hp&&hp.classList.contains('active')) renderHome();
-  }, err=>console.warn('tasks 오류:',err));
-
+  }, err=>{});
   // ── task_done: onSnapshot ──
   if(window._taskDoneUnsubscribe) window._taskDoneUnsubscribe();
-  window._taskDoneUnsubscribe = db.collection('task_done').onSnapshot(snap=>{
+  // task_done: 교사=전체, 학생=본인 것만 (where로 필터)
+  const _taskDoneQuery = session.isTeacher
+    ? db.collection('task_done')
+    : db.collection('task_done').where('student_id','==',String(session.studentId||''));
+  window._taskDoneUnsubscribe = _taskDoneQuery.onSnapshot(snap=>{
     if(!session.loggedIn) return;
     snap.docChanges().forEach(change=>{
       const d=change.doc;
@@ -6418,8 +6838,7 @@ function subscribeRealtime(){
     if(document.getElementById('taskCatContent')) renderTaskCatContent();
     const hp=document.getElementById('page-home');
     if(hp&&hp.classList.contains('active')) renderHome();
-  }, err=>console.warn('task_done 오류:',err));
-
+  }, err=>{});
   setDbStatus('online');
 }
 
@@ -6428,44 +6847,19 @@ async function pollChanges(){
   try{
     const todayKST=new Date().toLocaleDateString('ko-KR');
 
-    // ── 학생: 본인 데이터 1건만 읽기 ──
-    if(!session.isTeacher && session.studentId){
-      const d=await db.collection('students').doc(String(session.studentId)).get();
-      if(d.exists){
-        const r=d.data();
-        const s=state.students.find(x=>x.id===session.studentId);
-        if(s){
-          Object.assign(s,{balance:r.balance,transactions:r.transactions||[],
-            portfolio:convertPortfolio(r.portfolio||{}),items:r.items||[],
-            earned:r.earned||0,spent:r.spent||0,jobId:r.job_id});
-          updateNavBal();
-        }
-      }
-    }
+    // 학생 본인 데이터: onSnapshot으로 실시간 처리 (polling 불필요)
 
     // clean/seat/task_done: onSnapshot이 처리하므로 polling 불필요
 
-    // ── 주식: 주식 페이지 열려있을 때만 읽기 (항상 읽지 않음) ──
+    // ── 주식: onSnapshot이 처리하므로 polling 불필요 ──
+    // 주식 페이지 열려있을 때 UI만 갱신
     const stockPageActive=document.getElementById('page-stock')?.classList.contains('active');
     if(stockPageActive){
-      const stockSnap=await db.collection('stocks').get();
-      stockSnap.docs.forEach(d=>{
-        const r=d.data();
-        const code=r.code||d.id;
-        const stk=state.stocks[code];
-        if(stk){stk.price=r.price;stk.prevClose=r.prev_close;}
-      });
+      renderStockList();
+      if(state.selectedStock) selectStock(state.selectedStock);
     }
-    // ── 교사: 주식 페이지 열려있을 때 학생 portfolio 갱신 ──
-    if(session.isTeacher && stockPageActive){
-      const stuSnap=await db.collection('students').get();
-      stuSnap.docs.forEach(d=>{
-        const r=d.data();
-        const s=state.students.find(x=>String(x.id)===String(d.id));
-        if(s) s.portfolio=convertPortfolio(r.portfolio||{});
-      });
-      if(stockPageActive) renderStock();
-    }
+    // 교사 portfolio: students onSnapshot으로 처리됨 (추가 읽기 불필요)
+    if(session.isTeacher && stockPageActive) renderStock();
 
     // ── 아이템 사용 요청: 교사일 때 10틱(30분)마다 갱신 ──
     if(session.isTeacher && _pollTick%10===0){
@@ -6476,7 +6870,6 @@ async function pollChanges(){
 
     refreshCurrentPage();
   }catch(e){
-    console.warn('polling 오류(무시):', e);
   }
 }
 function refreshCurrentPage(){
@@ -6739,7 +7132,6 @@ async function resetAndSeedStudents(){
     toast('✅ 22명 학생 등록 완료! (초기 비밀번호: 1234)');
   }catch(e){
     alert('오류 발생: '+e.message);
-    console.error(e);
   }finally{
     if(btn){btn.disabled=false;btn.textContent='🔄 DB 학생 전체 초기화 후 22명 재등록';}
   }
@@ -6787,8 +7179,10 @@ async function dbSeedIfEmpty(){
     const rows=state.storeItems.map(i=>({id:i.id,name:i.name,emoji:i.emoji,price:i.price,stock:i.stock,description:i.desc}));
     for(const r of rows) await fbSet('store_items',r.id,r);
   }
-  // seed stocks
-  await dbInitStocks();
+  // seed stocks - 교사만 (실패해도 계속)
+  if(session.isTeacher){
+    try{ await dbInitStocks(); }catch(e){}
+  }
 }
 
 // ---- PATCH: DB 저장 연동 (함수 재할당 방식 — 호이스팅 문제 없음) ----
@@ -6835,7 +7229,11 @@ markAbsentClean = (studentId) => {
   const s = state.students.find(x => x.id === studentId);
   if(s) dbSaveStudent(s);
 };
-// teachMarkActivity removed (undefined in _orig)
+teachMarkActivity = (studentId, status) => {
+  _orig.teachMarkActivity(studentId, status);
+  const s = state.students.find(x => x.id === studentId);
+  if(s) dbSaveStudent(s);
+};
 paySalaries = async () => {
   _orig.paySalaries();
   for(const s of state.students){ if(s.jobId) await dbSaveStudent(s); }
@@ -6890,7 +7288,26 @@ updateNavBal = () => {
   // 주식 저장은 1시간 interval에서만 수행 (불필요한 쓰기 제거)
 };
 
-// first bootApp removed
+// ==================== APP BOOT ====================
+async function bootApp(){
+  initSupabase();
+  if(isDbReady()){
+    setDbStatus('connecting');
+    await dbSeedIfEmpty();
+    await loadStateFromDb();
+    subscribeRealtime();
+    // 배포 버전 즉시 Firebase에 기록 → 이전 버전 기기 강제 새로고침
+    setTimeout(()=>{
+      if(isDbReady()) db.collection('config').doc('1').set({app_version:'202603311544'},{merge:true}).catch(()=>{});
+    }, 2000);
+  } else {
+    setDbStatus('offline');
+  }
+  populateLoginStudentSel();
+  applyLoginInfo();
+  document.getElementById('loginScreen').style.display='none';
+  session={loggedIn:true,isTeacher:true,studentId:null}; startApp();
+}
 // ==================== 자동 로그인 (서버 재검증 포함) ====================
 // ⚠️ 보안: localStorage의 isTeacher 값을 그대로 신뢰하지 않습니다.
 // DB가 연결된 경우, studentId/isTeacher를 DB 데이터와 대조해 재검증합니다.
@@ -6912,13 +7329,11 @@ async function tryAutoLogin(){
         const cfgRow=await fbGet('config','1');
         if(!cfgRow || cfgRow.session_token !== saved.sessionToken){
           localStorage.removeItem('cb_session');
-          console.warn('[보안] 교사 세션 토큰 불일치 — 자동 로그인 거부');
           return;
         }
       } else if(isDbReady() && !saved.sessionToken){
         // sessionToken 없는 구버전 세션 — DB 있으면 무조건 재인증 요구
         localStorage.removeItem('cb_session');
-        console.warn('[보안] 구버전 교사 세션 — 재로그인 필요');
         return;
       }
       session={loggedIn:true,isTeacher:true,studentId:null};
@@ -6958,7 +7373,11 @@ async function bootApp(){
 
   // 2. 로그인 화면 즉시 표시
   initSupabase();
-  if(!isDbReady()){setDbStatus('offline');session={loggedIn:true,isTeacher:true,studentId:null};startApp();return;}
+  populateLoginStudentSel();
+  applyLoginInfo();
+  document.getElementById('loginScreen').style.display='none';
+
+  if(!isDbReady()){setDbStatus('offline');return;}
 
   // 3. 랜덤 딜레이 0~1초 (동시접속 분산)
   await new Promise(r=>setTimeout(r,Math.floor(Math.random()*1000)));
@@ -6969,20 +7388,16 @@ async function bootApp(){
       setDbStatus('connecting');
       await dbSeedIfEmpty();
       await loadStateFromDb();
-      subscribeRealtime();
-      session={loggedIn:true,isTeacher:true,studentId:null};
-      startApp();
+      populateLoginStudentSel();
+      session={loggedIn:true,isTeacher:true,studentId:null}; startApp();
+      subscribeRealtime(); // 로그인 완료 후 연결 (session.isTeacher 확정됨)
     }catch(e){
       if(retries>0){
-        console.warn('DB 로드 실패, 재시도...',e);
         setDbStatus('error');
         await new Promise(r=>setTimeout(r,2000));
         await loadWithRetry(retries-1);
       }else{
         setDbStatus('error');
-        console.error('DB 연결 최종 실패',e);
-        session={loggedIn:true,isTeacher:true,studentId:null};
-        startApp();
       }
     }
   }
